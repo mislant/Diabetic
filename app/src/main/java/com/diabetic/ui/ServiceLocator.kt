@@ -3,6 +3,7 @@ package com.diabetic.ui
 import android.content.Context
 import androidx.room.Room
 import com.diabetic.application.command.AddGlucoseLevel
+import com.diabetic.domain.model.GlucoseLevelRepository
 import com.diabetic.infrastructure.persistant.AppDatabase
 import com.diabetic.infrastructure.persistant.GlucoseLevelRoomRepository
 
@@ -35,6 +36,12 @@ class ServiceLocator private constructor() {
 
             return instance as ServiceLocator
         }
+    }
+
+    fun glucoseLevelRepository(): GlucoseLevelRepository {
+        return GlucoseLevelRoomRepository(
+            db.glucoseLevelDao()
+        )
     }
 
     fun addGlucoseLevelHandler(): AddGlucoseLevel.Handler {
