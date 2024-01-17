@@ -1,5 +1,6 @@
 package com.diabetic.domain.model
 
+import androidx.compose.ui.text.toUpperCase
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
@@ -13,6 +14,12 @@ data class GlucoseLevel(
     enum class MeasureType {
         BEFORE_MEAL,
         AFTER_MEAL;
+
+        companion object {
+            fun from(string: String): MeasureType {
+                return MeasureType.valueOf(string.uppercase())
+            }
+        }
 
         override fun toString(): String {
             return when (this) {

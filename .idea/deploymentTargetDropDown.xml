@@ -8,10 +8,10 @@
       <entry key="app">
         <State />
       </entry>
-      <entry key="save_glucose_level()">
+      <entry key="read_glucose_levels()">
         <State />
       </entry>
-      <entry key="useAppContext()">
+      <entry key="save_glucose_level()">
         <State />
       </entry>
     </value>

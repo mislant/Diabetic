@@ -51,4 +51,39 @@ class GlucoseLevelRoomRepositoryTest {
         assertEquals("before_meal", savedGlucoseLevel.measureType)
         assertEquals(1.2F, savedGlucoseLevel.value)
     }
+
+    @Test
+    fun read_glucose_levels() {
+        val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao())
+        val prepared = listOf(
+            GlucoseLevel(
+                GlucoseLevel.MeasureType.BEFORE_MEAL,
+                GlucoseLevel.Value(1.2F),
+                LocalDateTime.now()
+            ),
+            GlucoseLevel(
+                GlucoseLevel.MeasureType.BEFORE_MEAL,
+                GlucoseLevel.Value(1.2F),
+                LocalDateTime.now()
+            ),
+            GlucoseLevel(
+                GlucoseLevel.MeasureType.BEFORE_MEAL,
+                GlucoseLevel.Value(1.2F),
+                LocalDateTime.now()
+            ),
+        )
+        prepared.forEach { repository.persist(it) }
+
+        val currents = repository.fetchAll()
+
+        assertEquals(3, currents.count())
+        for (i in prepared.indices) {
+            val concretePrepared = prepared[i]
+            val concreteCurrent = currents[i];
+
+            assertEquals(concretePrepared.date(), concreteCurrent.date())
+            assertEquals(concretePrepared.value(), concreteCurrent.value())
+            assertEquals(concretePrepared.type(), concreteCurrent.type())
+        }
+    }
 }
