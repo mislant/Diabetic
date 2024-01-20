@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.infrastructure.persistant.AppDatabase
 import com.diabetic.infrastructure.persistant.GlucoseLevelRoomRepository
@@ -13,7 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
-import java.time.LocalDateTime
 
 
 @RunWith(AndroidJUnit4::class)
@@ -41,7 +41,7 @@ class GlucoseLevelRoomRepositoryTest {
         val glucoseLevel = GlucoseLevel(
             GlucoseLevel.MeasureType.BEFORE_MEAL,
             GlucoseLevel.Value(1.2F),
-            GlucoseLevel.DateTime()
+            DateTime()
         )
 
         repository.persist(glucoseLevel)
@@ -61,7 +61,7 @@ class GlucoseLevelRoomRepositoryTest {
                 GlucoseLevel(
                     GlucoseLevel.MeasureType.BEFORE_MEAL,
                     GlucoseLevel.Value(1.2F),
-                    GlucoseLevel.DateTime()
+                    DateTime()
                 ),
             )
         }

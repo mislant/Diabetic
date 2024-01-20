@@ -1,8 +1,8 @@
 package com.diabetic.application.command
 
+import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
-import java.time.LocalDateTime
 
 class AddGlucoseLevel {
     data class Command(
@@ -17,7 +17,7 @@ class AddGlucoseLevel {
             val level = GlucoseLevel(
                 command.type,
                 GlucoseLevel.Value(command.value),
-                GlucoseLevel.DateTime()
+                DateTime()
             )
 
             repository.persist(level)

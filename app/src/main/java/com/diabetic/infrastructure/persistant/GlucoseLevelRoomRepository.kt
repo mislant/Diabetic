@@ -1,5 +1,6 @@
 package com.diabetic.infrastructure.persistant
 
+import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
 
@@ -9,7 +10,7 @@ class GlucoseLevelRoomRepository(private var dao: GlucoseLevelDAO) : GlucoseLeve
             GlucoseLevel(
                 GlucoseLevel.MeasureType.from(it.measureType),
                 GlucoseLevel.Value(it.value),
-                GlucoseLevel.DateTime(it.date),
+                DateTime.fromString(it.date),
                 it.id
             )
         }

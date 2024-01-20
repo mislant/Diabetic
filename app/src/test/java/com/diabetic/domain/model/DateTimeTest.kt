@@ -6,13 +6,13 @@ import org.junit.Test
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
-class GlucoseLevelDateTimeTest {
+class DateTimeTest {
 
     @Test
     fun construction_from_string() {
         val time = "2024-01-17T13:30:30.000Z"
 
-        val datetime = GlucoseLevel.DateTime(time)
+        val datetime = DateTime.fromString(time)
 
         assertEquals(time, datetime.format().iso())
     }
@@ -22,7 +22,7 @@ class GlucoseLevelDateTimeTest {
         val time = "12351234123"
 
         try {
-            val datetime = GlucoseLevel.DateTime(time)
+            val datetime = DateTime.fromString(time)
 
             assertTrue(false)
         } catch (e: IllegalArgumentException) {
@@ -34,10 +34,10 @@ class GlucoseLevelDateTimeTest {
     fun construction_from_empty_parameters() {
         val current = LocalDateTime.now()
 
-        val datetime = GlucoseLevel.DateTime()
+        val datetime = DateTime()
 
         assertEquals(
-            current.format(DateTimeFormatter.ofPattern(GlucoseLevel.DateTime.READABLE)),
+            current.format(DateTimeFormatter.ofPattern(DateTime.READABLE)),
             datetime.format().readable()
         )
     }

@@ -13,8 +13,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
-import java.time.LocalDateTime
 
 @Composable
 fun GlucoseLevelTable(levels: List<GlucoseLevel>) {
@@ -75,7 +75,7 @@ fun GlucoseLevelTablePreview() {
             GlucoseLevel(
                 GlucoseLevel.MeasureType.BEFORE_MEAL,
                 GlucoseLevel.Value(1.2F),
-                GlucoseLevel.DateTime(),
+                DateTime(),
                 it
             )
         )
