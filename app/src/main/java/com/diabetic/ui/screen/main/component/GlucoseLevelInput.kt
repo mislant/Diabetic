@@ -30,7 +30,7 @@ fun GlucoseLevelInput(
         GlucoseLevel.MeasureType.AFTER_MEAL -> "После еды"
     }
 
-    val model = viewModel<Model>()
+    val model = viewModel<Model>(key = type.toString())
     val level by model.level.collectAsState()
 
     OutlinedTextField(

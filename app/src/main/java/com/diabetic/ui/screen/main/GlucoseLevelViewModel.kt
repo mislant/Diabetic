@@ -27,6 +27,17 @@ class GlucoseLevelViewModel(
         _glucoseLevels.value = repository.fetchAll()
     }
 
+    fun addGlucoseLevelAfterMeal(value: Float) {
+        addHandler.handle(
+            AddGlucoseLevel.Command(
+                value,
+                GlucoseLevel.MeasureType.AFTER_MEAL
+            )
+        )
+
+        _glucoseLevels.value = repository.fetchAll()
+    }
+
     companion object {
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")

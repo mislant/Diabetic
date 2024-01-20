@@ -53,6 +53,12 @@ fun Content(glucoseLevelModel: GlucoseLevelViewModel) {
                     type = GlucoseLevel.MeasureType.BEFORE_MEAL,
                     handleAddingLevel = { glucoseLevelModel.addGlucoseLevelBeforeMeal(it) }
                 )
+                GlucoseLevelInput(
+                    modifier = Modifier
+                        .width(180.dp),
+                    type = GlucoseLevel.MeasureType.AFTER_MEAL,
+                    handleAddingLevel = { glucoseLevelModel.addGlucoseLevelAfterMeal(it) }
+                )
             }
 
             Spacer(modifier = Modifier.height(10.dp))
