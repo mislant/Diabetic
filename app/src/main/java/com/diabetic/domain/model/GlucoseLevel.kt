@@ -1,9 +1,5 @@
 package com.diabetic.domain.model
 
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeParseException
-
 data class GlucoseLevel(
     var type: MeasureType,
     var value: Value,
@@ -18,6 +14,12 @@ data class GlucoseLevel(
         id: Int
     ) : this(type, value, date) {
         this.id = id
+    }
+
+    companion object {
+        fun beforeMeal(value: Value, datetime: DateTime): GlucoseLevel {
+            return GlucoseLevel(MeasureType.BEFORE_MEAL, value, datetime)
+        }
     }
 
     enum class MeasureType {
@@ -38,7 +40,8 @@ data class GlucoseLevel(
         }
     }
 
-    data class Value(
+    @JvmInline
+    value class Value(
         val level: Float
     ) {
         init {
