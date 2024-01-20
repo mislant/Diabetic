@@ -1,12 +1,8 @@
 package com.diabetic.infrastructure
 
-import android.content.Context
-import androidx.room.Room
-import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
-import com.diabetic.infrastructure.persistant.AppDatabase
 import com.diabetic.infrastructure.persistant.GlucoseLevelRoomRepository
 import org.junit.After
 import org.junit.Assert.*
@@ -15,24 +11,18 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 
-
 @RunWith(AndroidJUnit4::class)
-class GlucoseLevelRoomRepositoryTest {
-    private lateinit var db: AppDatabase
+class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
 
     @Before
-    fun createDb() {
-        val context = ApplicationProvider.getApplicationContext<Context>();
-        db = Room.inMemoryDatabaseBuilder(
-            context,
-            AppDatabase::class.java,
-        ).build()
+    fun before() {
+        initDb()
     }
 
     @After
     @Throws(IOException::class)
-    fun closeDb() {
-        db.close()
+    fun after() {
+        closeDb()
     }
 
     @Test()
@@ -47,7 +37,7 @@ class GlucoseLevelRoomRepositoryTest {
         repository.persist(glucoseLevel)
         val savedGlucoseLevel = db.glucoseLevelDao().byId(1)
 
-        assertEquals(1, savedGlucoseLevel.id);
+        assertEquals(1, savedGlucoseLevel.id)
         assertEquals("before_meal", savedGlucoseLevel.measureType)
         assertEquals(1.2F, savedGlucoseLevel.value)
     }
@@ -72,7 +62,7 @@ class GlucoseLevelRoomRepositoryTest {
         assertEquals(3, currents.count())
         for (i in prepared.indices) {
             val concretePrepared = prepared[i]
-            val concreteCurrent = currents[i];
+            val concreteCurrent = currents[i]
 
             assertEquals(
                 concretePrepared.date.format().readable(),

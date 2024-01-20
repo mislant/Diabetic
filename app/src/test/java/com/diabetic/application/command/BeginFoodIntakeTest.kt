@@ -8,7 +8,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class AddFoodIntakeTest {
+class BeginFoodIntakeTest {
     @Mock
     private lateinit var repository: FoodIntakeRepository
 
@@ -19,24 +19,24 @@ class AddFoodIntakeTest {
 
     @Test
     fun adding_valid_food_intake() {
-        val handler = AddFoodIntake.Handler(repository)
-        val command = AddFoodIntake.Command(
+        val handler = BeginFoodIntake.Handler(repository)
+        val command = BeginFoodIntake.Command(
             1.2F,
             10
         )
 
-        handler.handle(command);
+        handler.handle(command)
 
         assertTrue(true)
     }
 
     @Test
     fun trying_to_add_invalid_food_intake() {
-        val handler = AddFoodIntake.Handler(repository)
+        val handler = BeginFoodIntake.Handler(repository)
         val invalidCommands = mapOf(
-            Pair("Glucose level can not be less or equal zero", AddFoodIntake.Command(0.0F, 10)),
-            Pair("Glucose level can not be less or equal zero", AddFoodIntake.Command(-1.0F, 10)),
-            Pair("Bread units can not be less or equal zero", AddFoodIntake.Command(1.2F, 0)),
+            Pair("Glucose level can not be less or equal zero", BeginFoodIntake.Command(0.0F, 10)),
+            Pair("Glucose level can not be less or equal zero", BeginFoodIntake.Command(-1.0F, 10)),
+            Pair("Bread units can not be less or equal zero", BeginFoodIntake.Command(1.2F, 0)),
         )
 
         invalidCommands.forEach {

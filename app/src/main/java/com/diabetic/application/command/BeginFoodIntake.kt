@@ -6,7 +6,7 @@ import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.FoodIntakeRepository
 import com.diabetic.domain.model.GlucoseLevel
 
-class AddFoodIntake {
+class BeginFoodIntake {
     data class Command(
         val glucoseLevelBeforeMeal: Float,
         val breadUnit: Int,
@@ -19,6 +19,7 @@ class AddFoodIntake {
             val time = DateTime()
             val foodIntake = FoodIntake(
                 BreadUnit(command.breadUnit),
+                time,
                 GlucoseLevel.beforeMeal(
                     GlucoseLevel.Value(command.glucoseLevelBeforeMeal),
                     time

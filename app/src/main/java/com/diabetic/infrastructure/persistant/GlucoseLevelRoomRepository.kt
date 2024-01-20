@@ -4,7 +4,7 @@ import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
 
-class GlucoseLevelRoomRepository(private var dao: GlucoseLevelDAO) : GlucoseLevelRepository {
+class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDAO) : GlucoseLevelRepository {
     override fun fetchAll(): List<GlucoseLevel> {
         return dao.all().map {
             GlucoseLevel(
