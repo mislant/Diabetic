@@ -17,7 +17,7 @@ class AddGlucoseLevel {
             val level = GlucoseLevel(
                 command.type,
                 GlucoseLevel.Value(command.value),
-                LocalDateTime.now()
+                GlucoseLevel.DateTime()
             )
 
             repository.persist(level)

@@ -41,7 +41,7 @@ class GlucoseLevelRoomRepositoryTest {
         val glucoseLevel = GlucoseLevel(
             GlucoseLevel.MeasureType.BEFORE_MEAL,
             GlucoseLevel.Value(1.2F),
-            LocalDateTime.now()
+            GlucoseLevel.DateTime()
         )
 
         repository.persist(glucoseLevel)
@@ -55,23 +55,16 @@ class GlucoseLevelRoomRepositoryTest {
     @Test
     fun read_glucose_levels() {
         val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao())
-        val prepared = listOf(
-            GlucoseLevel(
-                GlucoseLevel.MeasureType.BEFORE_MEAL,
-                GlucoseLevel.Value(1.2F),
-                LocalDateTime.now()
-            ),
-            GlucoseLevel(
-                GlucoseLevel.MeasureType.BEFORE_MEAL,
-                GlucoseLevel.Value(1.2F),
-                LocalDateTime.now()
-            ),
-            GlucoseLevel(
-                GlucoseLevel.MeasureType.BEFORE_MEAL,
-                GlucoseLevel.Value(1.2F),
-                LocalDateTime.now()
-            ),
-        )
+        val prepared = mutableListOf<GlucoseLevel>()
+        repeat(3) {
+            prepared.add(
+                GlucoseLevel(
+                    GlucoseLevel.MeasureType.BEFORE_MEAL,
+                    GlucoseLevel.Value(1.2F),
+                    GlucoseLevel.DateTime()
+                ),
+            )
+        }
         prepared.forEach { repository.persist(it) }
 
         val currents = repository.fetchAll()
@@ -81,9 +74,12 @@ class GlucoseLevelRoomRepositoryTest {
             val concretePrepared = prepared[i]
             val concreteCurrent = currents[i];
 
-            assertEquals(concretePrepared.date(), concreteCurrent.date())
-            assertEquals(concretePrepared.value(), concreteCurrent.value())
-            assertEquals(concretePrepared.type(), concreteCurrent.type())
+            assertEquals(
+                concretePrepared.date.format().readable(),
+                concreteCurrent.date.format().readable()
+            )
+            assertEquals(concretePrepared.value, concreteCurrent.value)
+            assertEquals(concretePrepared.type, concreteCurrent.type)
         }
     }
 }

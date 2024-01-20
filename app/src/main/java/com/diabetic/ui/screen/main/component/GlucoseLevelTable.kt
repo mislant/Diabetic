@@ -53,13 +53,13 @@ fun GlucoseLevelItem(level: GlucoseLevel) {
             horizontalArrangement = Arrangement.SpaceAround
         ) {
             Text(
-                text = when (level.type()) {
+                text = when (level.type) {
                     GlucoseLevel.MeasureType.AFTER_MEAL -> "Перед едой"
                     GlucoseLevel.MeasureType.BEFORE_MEAL -> "После еды"
                 }
             )
-            Text(text = level.value().toString())
-            Text(text = level.date())
+            Text(text = level.value.toString())
+            Text(text = level.date.format().readable())
         }
         Divider()
     }
@@ -71,14 +71,14 @@ fun GlucoseLevelTablePreview() {
     val levels = mutableListOf<GlucoseLevel>()
 
     repeat(3) {
-        val level = GlucoseLevel(
-            GlucoseLevel.MeasureType.BEFORE_MEAL,
-            GlucoseLevel.Value(1.2F),
-            LocalDateTime.now()
+        levels.add(
+            GlucoseLevel(
+                GlucoseLevel.MeasureType.BEFORE_MEAL,
+                GlucoseLevel.Value(1.2F),
+                GlucoseLevel.DateTime(),
+                it
+            )
         )
-
-        level.setId(it)
-        levels.add(level)
     }
 
     GlucoseLevelTable(levels = levels)
