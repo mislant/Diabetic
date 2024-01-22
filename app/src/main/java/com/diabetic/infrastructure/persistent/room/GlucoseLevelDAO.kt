@@ -1,14 +1,13 @@
-package com.diabetic.infrastructure.persistant
+package com.diabetic.infrastructure.persistent.room
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.diabetic.domain.model.GlucoseLevel
 
 @Dao
 interface GlucoseLevelDAO {
     @Insert
-    fun inset(glucoseLevel: GlucoseLevelEntity)
+    fun insert(glucoseLevel: GlucoseLevelEntity)
 
     @Query("SELECT * FROM glucose_level WHERE id=:id")
     fun byId(id: Int): GlucoseLevelEntity

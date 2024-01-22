@@ -1,9 +1,9 @@
-package com.diabetic.infrastructure
+package com.diabetic.infrastructure.room
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
-import com.diabetic.infrastructure.persistant.GlucoseLevelRoomRepository
+import com.diabetic.infrastructure.persistent.room.GlucoseLevelRoomRepository
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before

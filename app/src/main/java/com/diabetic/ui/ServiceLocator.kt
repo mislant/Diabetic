@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.diabetic.application.command.AddGlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
-import com.diabetic.infrastructure.persistant.AppDatabase
-import com.diabetic.infrastructure.persistant.GlucoseLevelRoomRepository
+import com.diabetic.infrastructure.persistent.room.AppDatabase
+import com.diabetic.infrastructure.persistent.room.GlucoseLevelRoomRepository
 
 class ServiceLocator private constructor() {
     private lateinit var db: AppDatabase
@@ -16,10 +16,10 @@ class ServiceLocator private constructor() {
 
         fun init(context: Context) {
             if (instance != null) {
-                return;
+                return
             }
 
-            instance = ServiceLocator();
+            instance = ServiceLocator()
             instance!!.db = Room.databaseBuilder(
                 context,
                 AppDatabase::class.java,

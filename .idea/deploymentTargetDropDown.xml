@@ -2,13 +2,13 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
-      <entry key="Tests in 'com.diabetic.infrastructure'">
+      <entry key="Tests in 'com.diabetic.infrastructure.room'">
         <State />
       </entry>
       <entry key="app">
         <State />
       </entry>
-      <entry key="save_new_food_intake()">
+      <entry key="carbohydrate_saving_works()">
         <State />
       </entry>
     </value>

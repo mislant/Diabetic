@@ -1,4 +1,4 @@
-package com.diabetic.infrastructure.persistant
+package com.diabetic.infrastructure.persistent.room
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity

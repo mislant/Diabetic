@@ -1,4 +1,4 @@
-package com.diabetic.infrastructure.persistant
+package com.diabetic.infrastructure.persistent.room
 
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
@@ -17,7 +17,7 @@ class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDAO) : GlucoseLeve
     }
 
     override fun persist(glucoseLevel: GlucoseLevel) {
-        dao.inset(
+        dao.insert(
             GlucoseLevelEntity(
                 measureType = glucoseLevel.type.toString(),
                 date = glucoseLevel.date.format().iso(),

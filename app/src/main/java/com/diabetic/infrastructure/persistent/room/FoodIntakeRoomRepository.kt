@@ -1,4 +1,4 @@
-package com.diabetic.infrastructure.persistant
+package com.diabetic.infrastructure.persistent.room
 
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.FoodIntakeRepository

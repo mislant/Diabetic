@@ -1,9 +1,9 @@
-package com.diabetic.infrastructure
+package com.diabetic.infrastructure.room
 
 import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
-import com.diabetic.infrastructure.persistant.AppDatabase
+import com.diabetic.infrastructure.persistent.room.AppDatabase
 import java.io.IOException
 
 abstract class RoomRepositoryTest {

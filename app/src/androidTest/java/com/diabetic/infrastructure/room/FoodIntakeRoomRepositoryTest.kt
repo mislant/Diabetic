@@ -1,11 +1,11 @@
-package com.diabetic.infrastructure
+package com.diabetic.infrastructure.room
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.diabetic.domain.model.BreadUnit
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
-import com.diabetic.infrastructure.persistant.FoodIntakeRoomRepository
+import com.diabetic.infrastructure.persistent.room.FoodIntakeRoomRepository
 import org.junit.After
 import org.junit.Assert
 import org.junit.Before

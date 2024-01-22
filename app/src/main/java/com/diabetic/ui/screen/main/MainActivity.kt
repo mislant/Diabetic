@@ -22,7 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.diabetic.application.command.AddGlucoseLevel
 import com.diabetic.domain.model.GlucoseLevel
-import com.diabetic.infrastructure.persistant.StubGlucoseLevelRepository
+import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
 import com.diabetic.ui.screen.main.component.GlucoseLevelInput
 import com.diabetic.ui.screen.main.component.GlucoseLevelTable
 

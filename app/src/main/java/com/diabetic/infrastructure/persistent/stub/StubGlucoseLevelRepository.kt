@@ -1,4 +1,4 @@
-package com.diabetic.infrastructure.persistant
+package com.diabetic.infrastructure.persistent.stub
 
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
