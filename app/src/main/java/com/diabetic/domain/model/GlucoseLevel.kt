@@ -20,6 +20,10 @@ data class GlucoseLevel(
         fun beforeMeal(value: Value, datetime: DateTime): GlucoseLevel {
             return GlucoseLevel(MeasureType.BEFORE_MEAL, value, datetime)
         }
+
+        fun afterMeal(value: Value, datetime: DateTime): GlucoseLevel {
+            return GlucoseLevel(MeasureType.BEFORE_MEAL, value, datetime)
+        }
     }
 
     enum class MeasureType {

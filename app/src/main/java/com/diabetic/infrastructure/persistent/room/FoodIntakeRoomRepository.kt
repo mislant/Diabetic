@@ -9,4 +9,8 @@ class FoodIntakeRoomRepository(private val dao: FoodIntakeDao) : FoodIntakeRepos
         foodIntake.id = id.toInt()
         return foodIntake
     }
+
+    override fun getById(id: Int): FoodIntake? {
+        TODO("Not yet implemented")
+    }
 }

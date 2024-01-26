@@ -7,4 +7,14 @@ data class FoodIntake(
     var glucoseAfterMeal: GlucoseLevel? = null
 ) {
     var id: Int? = null
+
+    constructor(
+        id: Int,
+        breadUnit: BreadUnit,
+        date: DateTime,
+        glucoseBeforeMeal: GlucoseLevel,
+        glucoseAfterMeal: GlucoseLevel? = null
+    ) : this(breadUnit, date, glucoseBeforeMeal, glucoseAfterMeal) {
+        this.id = id
+    }
 }
