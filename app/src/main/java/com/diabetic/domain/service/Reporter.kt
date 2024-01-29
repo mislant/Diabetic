@@ -27,7 +27,7 @@ class Reporter {
 
     fun excel(glucoseLevels: List<GlucoseLevel>, meta: ReportMeta): Workbook {
         val workbook = XSSFWorkbook()
-        val sheet = workbook.createSheet(meta.name)
+        val sheet = workbook.createSheet("Показатели глюкозы")
 
         title(sheet, workbook, meta)
         header(sheet, workbook)
@@ -58,8 +58,8 @@ class Reporter {
         title.cellStyle = style
         title.setCellValue(
             "Показатели глюкозы с ${
-                meta.range.from().readable()
-            } по ${meta.range.to().readable()}"
+                meta.range.from.readable()
+            } по ${meta.range.to.readable()}"
         )
     }
 
@@ -129,18 +129,15 @@ class Reporter {
 }
 
 data class ReportMeta(
-    val name: String,
-    val range: ReportRange
-)
+    val range: Range
+) {
+    @JvmInline
+    value class Range(private val range: Pair<LocalDateTime, LocalDateTime>) {
+        val from
+            get() = range.first
 
-@JvmInline
-value class ReportRange(private val range: Pair<LocalDateTime, LocalDateTime>) {
-    fun from(): LocalDateTime {
-        return range.first
-    }
-
-    fun to(): LocalDateTime {
-        return range.second
+        val to
+            get() = range.second
     }
 }
 

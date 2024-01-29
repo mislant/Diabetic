@@ -12,8 +12,7 @@ class ReporterTest {
     fun `creating glucose levels excel report`() {
         val meta =
             ReportMeta(
-                "test_report",
-                ReportRange(
+                ReportMeta.Range(
                     Pair(
                         LocalDateTime.now(),
                         LocalDateTime.now()
@@ -28,7 +27,7 @@ class ReporterTest {
                 date = DateTime()
             )
         }
-        val report = File("src/test/res/runtime/${meta.name}.xlsx")
+        val report = File("src/test/res/runtime/test_report.xlsx")
 
         report
             .outputStream()
