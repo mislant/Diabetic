@@ -23,7 +23,7 @@ class CarbohydrateDataStoreStorageTest : RoomRepositoryTest() {
     }
 
     @Test
-    fun carbohydrate_saving_works() {
+    fun `carbohydrate saving works`() {
         val repository = CarbohydrateDataStoreStorage(db.keyValueDao())
         val carbohydrate = Carbohydrate(1F)
 

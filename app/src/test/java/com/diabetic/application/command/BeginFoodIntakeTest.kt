@@ -18,7 +18,7 @@ class BeginFoodIntakeTest {
     }
 
     @Test
-    fun adding_valid_food_intake() {
+    fun `adding food intake`() {
         val handler = BeginFoodIntake.Handler(repository)
         val command = BeginFoodIntake.Command(
             1.2F,
@@ -31,7 +31,7 @@ class BeginFoodIntakeTest {
     }
 
     @Test
-    fun trying_to_add_invalid_food_intake() {
+    fun `errors on trying to add invalid food intake`() {
         val handler = BeginFoodIntake.Handler(repository)
         val invalidCommands = mapOf(
             Pair("Glucose level can not be less or equal zero", BeginFoodIntake.Command(0.0F, 10)),

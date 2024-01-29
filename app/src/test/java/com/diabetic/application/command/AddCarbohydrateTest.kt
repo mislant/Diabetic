@@ -17,7 +17,7 @@ class AddCarbohydrateTest {
     }
 
     @Test
-    fun adding_valid_carbohydrate() {
+    fun `add valid carbohydrate`() {
         val handler = AddCarbohydrate.Handler(storage)
         val command = AddCarbohydrate.Command(1F)
 

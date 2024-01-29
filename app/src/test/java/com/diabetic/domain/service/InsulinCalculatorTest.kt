@@ -9,7 +9,7 @@ import org.junit.Test
 class InsulinCalculatorTest {
 
     @Test
-    fun inline_calculating_before_food_intake() {
+    fun `calculating insulin before food intake`() {
         val breadUnit = BreadUnit(1)
         val carbohydrate = Carbohydrate(1.2F)
         val calculator = InsulinCalculator()

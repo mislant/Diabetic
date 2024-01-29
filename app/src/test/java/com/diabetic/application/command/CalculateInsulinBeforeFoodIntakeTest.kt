@@ -18,7 +18,7 @@ import org.mockito.Mockito.`when`
 class CalculateInsulinBeforeFoodIntakeTest {
 
     @Test
-    fun success_calculating_insulin() {
+    fun `correct insulin calculation`() {
         val handler = CalculateInsulinBeforeFoodIntake.Handler(
             Preset.repository(),
             Preset.storage()
@@ -33,7 +33,7 @@ class CalculateInsulinBeforeFoodIntakeTest {
     }
 
     @Test
-    fun expect_food_intake_not_found() {
+    fun `throws food intake not found exception`() {
         val handler = CalculateInsulinBeforeFoodIntake.Handler(
             Preset.emptyRepository(),
             Preset.storage()
@@ -48,7 +48,7 @@ class CalculateInsulinBeforeFoodIntakeTest {
     }
 
     @Test
-    fun expect_carbohydrate_required() {
+    fun `throws carbohydrate required exception`() {
         val handler = CalculateInsulinBeforeFoodIntake.Handler(
             Preset.repository(),
             Preset.emptyStorage()

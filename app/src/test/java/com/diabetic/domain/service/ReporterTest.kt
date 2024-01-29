@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 
 class ReporterTest {
     @Test
-    fun creating_glucose_levels_excel_report() {
+    fun `creating glucose levels excel report`() {
         val meta =
             ReportMeta(
                 "test_report",

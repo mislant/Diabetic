@@ -1,16 +1,15 @@
 package com.diabetic.domain.model
 
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertTrue
+import org.junit.Assert.assertThrows
 import org.junit.Test
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 class DateTimeTest {
 
     @Test
-    fun construction_from_string() {
-        val time = "2024-01-17T13:30:30.000Z"
+    fun `date constructing from ISO string`() {
+        val time = "2024-01-17 13:30:30.000"
 
         val datetime = DateTime.fromString(time)
 
@@ -18,26 +17,22 @@ class DateTimeTest {
     }
 
     @Test
-    fun invalid_string_value_for_datetime() {
+    fun `exception on invalid date string`() {
         val time = "12351234123"
 
-        try {
-            val datetime = DateTime.fromString(time)
-
-            assertTrue(false)
-        } catch (e: IllegalArgumentException) {
-            assertTrue(true)
+        assertThrows(IllegalArgumentException::class.java) {
+            DateTime.fromString(time)
         }
     }
 
     @Test
-    fun construction_from_empty_parameters() {
+    fun `creating current datetime value from empty constructor`() {
         val current = LocalDateTime.now()
 
         val datetime = DateTime()
 
         assertEquals(
-            current.format(DateTimeFormatter.ofPattern(DateTime.READABLE)),
+            current.readable(),
             datetime.format().readable()
         )
     }

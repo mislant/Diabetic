@@ -2,12 +2,12 @@ package com.diabetic.application.command
 
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
-import org.junit.Test
-import org.junit.Assert.*
+import org.junit.Assert.assertThrows
+import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
-import java.lang.IllegalArgumentException
 
 class AddGlucoseLevelTest {
     @Mock
@@ -19,7 +19,7 @@ class AddGlucoseLevelTest {
     }
 
     @Test
-    fun adding_valid_glucose_level() {
+    fun `adding valid glucose level`() {
         val handler = AddGlucoseLevel.Handler(repository)
         val command = AddGlucoseLevel.Command(
             1.2F,
@@ -31,14 +31,16 @@ class AddGlucoseLevelTest {
         assertTrue(true)
     }
 
-    @Test(expected = IllegalArgumentException::class)
-    fun invalid_glucose_level() {
+    @Test
+    fun `throws exception on invalid glucose level`() {
         val handler = AddGlucoseLevel.Handler(repository)
         val command = AddGlucoseLevel.Command(
             -1.2F,
             GlucoseLevel.MeasureType.BEFORE_MEAL
         )
 
-        handler.handle(command);
+        assertThrows(IllegalArgumentException::class.java) {
+            handler.handle(command);
+        }
     }
 }

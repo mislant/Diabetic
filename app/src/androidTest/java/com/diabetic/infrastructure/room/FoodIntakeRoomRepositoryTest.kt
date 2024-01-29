@@ -29,7 +29,7 @@ class FoodIntakeRoomRepositoryTest : RoomRepositoryTest() {
     }
 
     @Test
-    fun save_new_food_intake() {
+    fun `save new food intake`() {
         val repository = FoodIntakeRoomRepository(db.foodIntakeDao())
         val date = DateTime()
         val foodIntake = FoodIntake(
