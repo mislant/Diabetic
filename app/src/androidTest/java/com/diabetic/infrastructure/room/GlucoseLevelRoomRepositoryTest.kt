@@ -26,7 +26,7 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
     }
 
     @Test()
-    fun save_glucose_level() {
+    fun `save glucose level`() {
         val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao())
         val glucoseLevel = GlucoseLevel(
             GlucoseLevel.MeasureType.BEFORE_MEAL,
@@ -43,7 +43,7 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
     }
 
     @Test
-    fun read_glucose_levels() {
+    fun `read glucose levels`() {
         val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao())
         val prepared = mutableListOf<GlucoseLevel>()
         repeat(3) {
@@ -70,6 +70,40 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
             )
             assertEquals(concretePrepared.value, concreteCurrent.value)
             assertEquals(concretePrepared.type, concreteCurrent.type)
+        }
+    }
+
+    @Test
+    fun `read levels from time range`() {
+        val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao())
+        val dates = listOf(
+            "2024-01-01 00:00:00.000",
+            "2024-01-02 01:00:00.000",
+            "2024-01-02 02:00:00.000",
+            "2024-01-03 00:00:00.000",
+        )
+        val stored = List(4) { i ->
+            GlucoseLevel(
+                GlucoseLevel.MeasureType.BEFORE_MEAL,
+                GlucoseLevel.Value(1.2F),
+                DateTime.fromString(dates[i])
+            ).also { repository.persist(it) }
+        }
+
+        val fetched = repository.fetchRange(
+            DateTime.fromString("2024-01-01 00:00:00.000").localDataTime(),
+            DateTime.fromString("2024-01-02 02:00:00.000").localDataTime()
+        )
+
+        assertEquals(3, fetched.count())
+        fetched.forEachIndexed { i, concreteFetched ->
+            val concretePrepared = stored[i]
+            assertEquals(
+                concretePrepared.date.format().readable(),
+                concreteFetched.date.format().readable()
+            )
+            assertEquals(concretePrepared.value, concreteFetched.value)
+            assertEquals(concretePrepared.type, concreteFetched.type)
         }
     }
 }

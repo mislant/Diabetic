@@ -3,17 +3,16 @@ package com.diabetic.infrastructure.persistent.room
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
+import com.diabetic.domain.model.iso
+import java.time.LocalDateTime
 
 class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDAO) : GlucoseLevelRepository {
     override fun fetchAll(): List<GlucoseLevel> {
-        return dao.all().map {
-            GlucoseLevel(
-                GlucoseLevel.MeasureType.from(it.measureType),
-                GlucoseLevel.Value(it.value),
-                DateTime.fromString(it.date),
-                it.id
-            )
-        }
+        return dao.all().map { it.cast() }
+    }
+
+    override fun fetchRange(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
+        return dao.all(from.iso(), to.iso()).map { it.cast() }
     }
 
     override fun persist(glucoseLevel: GlucoseLevel) {
@@ -26,3 +25,11 @@ class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDAO) : GlucoseLeve
         )
     }
 }
+
+private fun GlucoseLevelEntity.cast() = GlucoseLevel(
+    id = id,
+    type = GlucoseLevel.MeasureType.from(measureType),
+    value = GlucoseLevel.Value(value),
+    date = DateTime.fromString(date)
+)
+

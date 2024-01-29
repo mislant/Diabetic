@@ -14,4 +14,7 @@ interface GlucoseLevelDAO {
 
     @Query("SELECT * FROM glucose_level")
     fun all(): List<GlucoseLevelEntity>
+
+    @Query("SELECT * FROM glucose_level WHERE date BETWEEN :from AND :to")
+    fun all(from: String, to: String): List<GlucoseLevelEntity>
 }

@@ -7,7 +7,7 @@ import java.time.format.DateTimeParseException
 @JvmInline
 value class DateTime(private val value: LocalDateTime = LocalDateTime.now()) {
     companion object {
-        const val ISO = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
+        const val ISO = "yyyy-MM-dd HH:mm:ss.SSS"
         const val READABLE = "yyyy-MM-dd HH:mm"
         const val READABLE_DATE = "yyyy-MM-dd"
 
