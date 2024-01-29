@@ -9,6 +9,7 @@ value class DateTime(private val value: LocalDateTime = LocalDateTime.now()) {
     companion object {
         const val ISO = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
         const val READABLE = "yyyy-MM-dd HH:mm"
+        const val READABLE_DATE = "yyyy-MM-dd"
 
         fun fromString(value: String): DateTime {
             try {
@@ -25,14 +26,26 @@ value class DateTime(private val value: LocalDateTime = LocalDateTime.now()) {
 
     }
 
+    fun localDataTime(): LocalDateTime {
+        return value
+    }
+
     fun format(): Format = Format(this)
 
     class Format(private val datetime: DateTime) {
-        fun iso(): String = datetime.value.format(formatter(ISO))
+        fun iso(): String = datetime.value.format(ISO)
 
-        fun readable(): String = datetime.value.format(formatter(READABLE))
+        fun readable(): String = datetime.value.format(READABLE)
 
-        private fun formatter(pattern: String): DateTimeFormatter =
-            DateTimeFormatter.ofPattern(pattern)
+        fun readableDate(): String = datetime.value.format(READABLE_DATE)
+
+        private fun LocalDateTime.format(pattern: String): String =
+            this.format(DateTimeFormatter.ofPattern(pattern))
     }
 }
+
+fun LocalDateTime.iso(): String = DateTime(this).format().iso()
+
+fun LocalDateTime.readable(): String = DateTime(this).format().readable()
+
+fun LocalDateTime.readableDate(): String = DateTime(this).format().readableDate()

@@ -1,6 +1,8 @@
-package com.diabetic.domain.model
+package com.diabetic.domain.service
 
-import com.diabetic.domain.service.InsulinCalculator
+import com.diabetic.domain.model.BreadUnit
+import com.diabetic.domain.model.Carbohydrate
+import com.diabetic.domain.model.Insulin
 import org.junit.Assert
 import org.junit.Test
 
