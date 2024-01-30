@@ -12,7 +12,10 @@ class StubGlucoseLevelRepository : GlucoseLevelRepository {
     }
 
     override fun fetchRange(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
-        return storage.toList()
+        return storage.toList().filter {
+            it.date.localDataTime() > from &&
+                    it.date.localDataTime() < to
+        }
     }
 
     override fun persist(glucoseLevel: GlucoseLevel) {
