@@ -3,52 +3,62 @@ package com.diabetic.ui
 import android.content.Context
 import androidx.room.Room
 import com.diabetic.application.command.AddGlucoseLevel
+import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.GlucoseLevelRepository
+import com.diabetic.infrastructure.persistent.file.android.InternalExcelReportStorage
 import com.diabetic.infrastructure.persistent.room.AppDatabase
 import com.diabetic.infrastructure.persistent.room.GlucoseLevelRoomRepository
+import kotlin.reflect.KClass
 
-class ServiceLocator private constructor() {
-    private lateinit var db: AppDatabase
+object ServiceLocator {
+    private val container: MutableMap<KClass<*>, Any> = mutableMapOf()
 
-    companion object {
-        @Volatile
-        private var instance: ServiceLocator? = null
+    fun init(ctx: Context) {
+        initDb(ctx)
+        initReportStorage(ctx)
+    }
 
-        fun init(context: Context) {
-            if (instance != null) {
-                return
-            }
+    private fun initDb(ctx: Context) {
+        val db = Room.databaseBuilder(
+            ctx,
+            AppDatabase::class.java,
+            "diabetic-database"
+        )
+            .allowMainThreadQueries()
+            .build()
 
-            instance = ServiceLocator()
-            instance!!.db = Room.databaseBuilder(
-                context,
-                AppDatabase::class.java,
-                "diabetic-database"
+        container[AppDatabase::class] = db
+    }
+
+    private fun initReportStorage(ctx: Context) {
+        container[PrepareGlucoseLevelsReport.ExcelReportStorage::class] =
+            InternalExcelReportStorage(
+                ctx.filesDir
             )
-                .allowMainThreadQueries()
-                .build()
-        }
+    }
 
-        fun get(): ServiceLocator {
-            if (instance == null) {
-                throw RuntimeException("Call init method before using service locator!")
-            }
-
-            return instance as ServiceLocator
-        }
+    @Suppress("UNCHECKED_CAST")
+    private fun <T : Any> get(what: KClass<T>): T {
+        val obj = container[what] ?: throw RuntimeException("Service not initialized")
+        return obj as T
     }
 
     fun glucoseLevelRepository(): GlucoseLevelRepository {
         return GlucoseLevelRoomRepository(
-            db.glucoseLevelDao()
+            get(AppDatabase::class).glucoseLevelDao()
         )
     }
 
     fun addGlucoseLevelHandler(): AddGlucoseLevel.Handler {
         return AddGlucoseLevel.Handler(
-            GlucoseLevelRoomRepository(
-                db.glucoseLevelDao()
-            )
+            glucoseLevelRepository()
+        )
+    }
+
+    fun prepareGlucoseLevelReport(): PrepareGlucoseLevelsReport.Handler {
+        return PrepareGlucoseLevelsReport.Handler(
+            glucoseLevelRepository(),
+            get(PrepareGlucoseLevelsReport.ExcelReportStorage::class)
         )
     }
 }
