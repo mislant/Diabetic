@@ -141,7 +141,7 @@ data class ReportMeta(
     }
 }
 
-fun CellStyle.setBorder(style: BorderStyle) {
+private fun CellStyle.setBorder(style: BorderStyle) {
     this.borderTop = style
     this.borderBottom = style
     this.borderLeft = style

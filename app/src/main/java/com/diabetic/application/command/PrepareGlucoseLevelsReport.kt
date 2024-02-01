@@ -4,7 +4,7 @@ import com.diabetic.domain.model.GlucoseLevelRepository
 import com.diabetic.domain.model.readable
 import com.diabetic.domain.service.ReportMeta
 import com.diabetic.domain.service.excel
-import java.io.FileOutputStream
+import java.io.File
 import java.time.LocalDateTime
 
 class PrepareGlucoseLevelsReport {
@@ -13,15 +13,11 @@ class PrepareGlucoseLevelsReport {
         val to: LocalDateTime,
     )
 
-    interface ExcelReportStorage {
-        fun new(name: String): FileOutputStream
-    }
-
     class Handler(
         private val repository: GlucoseLevelRepository,
         private val storage: ExcelReportStorage
     ) {
-        fun handle(command: Command) {
+        fun handle(command: Command): File {
             val range = ReportMeta.Range(Pair(command.from, command.to))
             val glucoseLevels = repository.fetchRange(
                 range.from,
@@ -32,9 +28,15 @@ class PrepareGlucoseLevelsReport {
                 .replace(' ', '_')
             val meta = ReportMeta(range)
 
-            storage.new(report)
-                .excel(glucoseLevels, meta)
-                .close()
+            return storage.new(report).apply {
+                outputStream()
+                    .excel(glucoseLevels, meta)
+                    .close()
+            }
         }
+    }
+
+    interface ExcelReportStorage {
+        fun new(name: String): File
     }
 }

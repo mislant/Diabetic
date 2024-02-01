@@ -2,10 +2,13 @@ package com.diabetic.application.command
 
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.readable
 import com.diabetic.infrastructure.persistent.file.stub.TestExcelReportStorage
 import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.nio.file.Files
 
 class PrepareGlucoseReportTest {
 
@@ -35,8 +38,17 @@ class PrepareGlucoseReportTest {
             DateTime.fromString("2024-01-02 23:59:59.000").localDataTime()
         )
 
-        handler.handle(command)
+        val file = handler.handle(command)
 
-        Assert.assertTrue(true)
+        assertTrue(file.exists())
+        assertTrue(file.length() > 0)
+        assertEquals(
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            Files.probeContentType(file.toPath())
+        )
+        assertEquals(
+            "Glucose_report.2024-01-01_00:00-2024-01-02_23:59.xlsx",
+            file.name
+        )
     }
 }
