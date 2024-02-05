@@ -12,7 +12,11 @@ class AddCarbohydrate {
         private val storage: CarbohydrateStorage
     ) {
         fun handle(command: Command) {
-            storage.set(Carbohydrate(command.rate))
+            val savedRate = storage.get()
+
+            if (savedRate == null || savedRate.value != command.rate) {
+                storage.set(Carbohydrate(command.rate))
+            }
         }
     }
 }

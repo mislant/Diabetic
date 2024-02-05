@@ -18,5 +18,5 @@ import androidx.room.PrimaryKey
 class KeyValueEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "key") val key: String,
-    @ColumnInfo(name = "value") val value: String
+    @ColumnInfo(name = "value") var value: String
 )

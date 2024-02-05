@@ -2,6 +2,7 @@ package com.diabetic.infrastructure.persistent.room
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.Query
 import androidx.room.Transaction
 import com.diabetic.domain.model.FoodIntake
 
@@ -31,4 +32,7 @@ interface FoodIntakeDao {
 
     @Insert
     fun insertFoodIntake(foodIntake: FoodIntakeEntity): Long
+
+    @Query("SELECT * FROM food_intake WHERE id=:id")
+    fun fetchFoodIntakeGlucose(id: Int): FoodIntakeGlucoseEntity?
 }

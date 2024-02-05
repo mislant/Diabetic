@@ -15,7 +15,7 @@ class BeginFoodIntake {
     class Handler(
         private val repository: FoodIntakeRepository
     ) {
-        fun handle(command: Command) {
+        fun handle(command: Command): Int {
             val time = DateTime()
             val foodIntake = FoodIntake(
                 BreadUnit(command.breadUnit),
@@ -27,6 +27,8 @@ class BeginFoodIntake {
             )
 
             repository.persist(foodIntake)
+
+            return foodIntake.id!!
         }
     }
 }

@@ -4,7 +4,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.diabetic.domain.model.Carbohydrate
 import com.diabetic.infrastructure.persistent.room.CarbohydrateDataStoreStorage
 import org.junit.After
-import org.junit.Assert
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,6 +32,20 @@ class CarbohydrateDataStoreStorageTest : RoomRepositoryTest() {
         repository.set(carbohydrate)
         val saved = repository.get()
 
-        Assert.assertTrue(carbohydrate == saved)
+        assertTrue(carbohydrate == saved)
+    }
+
+    @Test
+    fun `rewrite existed carbohydrate without errors`() {
+        val carbohydrate = Carbohydrate(2F)
+        val repository = CarbohydrateDataStoreStorage(db.keyValueDao()).apply {
+            set(Carbohydrate(1F))
+        }
+
+        repository.set(carbohydrate)
+        val saved = repository.get()
+
+        assertNotNull(saved)
+        assertEquals(carbohydrate.value, saved!!.value)
     }
 }

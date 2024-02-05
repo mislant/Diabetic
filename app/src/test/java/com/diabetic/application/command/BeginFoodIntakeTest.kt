@@ -1,6 +1,7 @@
 package com.diabetic.application.command
 
 import com.diabetic.domain.model.FoodIntakeRepository
+import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -19,7 +20,7 @@ class BeginFoodIntakeTest {
 
     @Test
     fun `adding food intake`() {
-        val handler = BeginFoodIntake.Handler(repository)
+        val handler = BeginFoodIntake.Handler(StubFoodIntakeRepository())
         val command = BeginFoodIntake.Command(
             1.2F,
             10

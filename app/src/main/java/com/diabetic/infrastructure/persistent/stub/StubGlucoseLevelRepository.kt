@@ -4,9 +4,7 @@ import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
 import java.time.LocalDateTime
 
-class StubGlucoseLevelRepository : GlucoseLevelRepository {
-    private val storage: MutableList<GlucoseLevel> = mutableListOf()
-
+class StubGlucoseLevelRepository : InMemoryStorage<GlucoseLevel>(), GlucoseLevelRepository {
     override fun fetchAll(): List<GlucoseLevel> {
         return storage.toList()
     }

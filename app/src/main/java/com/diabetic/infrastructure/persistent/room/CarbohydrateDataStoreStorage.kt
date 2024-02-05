@@ -9,12 +9,27 @@ class CarbohydrateDataStoreStorage(private val dao: KeyValueDao) :
     private val key = "carbohydrate"
 
     override fun set(rate: Carbohydrate) {
-        dao.insert(
-            KeyValueEntity(
-                key = key,
-                value = rate.value.toString(),
-            )
-        )
+        if (dao.exists(key)) update(rate)
+        else new(rate)
+    }
+
+    private fun update(rate: Carbohydrate) {
+        dao.run {
+            get(key)!!.also {
+                it.value = rate.value.toString()
+            }.also {
+                update(it)
+            }
+        }
+    }
+
+    private fun new(rate: Carbohydrate) {
+        KeyValueEntity(
+            key = key,
+            value = rate.value.toString(),
+        ).also {
+            dao.insert(it)
+        }
     }
 
     override fun get(): Carbohydrate? {
