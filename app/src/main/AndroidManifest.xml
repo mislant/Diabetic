@@ -22,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.diabetic.ui.screen.AddFoodIntakeActivity" />
+        <activity android:name="com.diabetic.ui.screen.AddGlucoseAfterFoodIntake" />
         <activity android:name="com.diabetic.ui.screen.StatisticActivity" />
     </application>
 

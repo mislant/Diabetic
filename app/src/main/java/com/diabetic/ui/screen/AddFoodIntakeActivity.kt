@@ -49,18 +49,18 @@ class AddFoodIntakeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val foodIntakeViewModel = viewModel<FoodIntakeViewModel>(
+            val model = viewModel<FoodIntakeViewModel>(
                 factory = FoodIntakeViewModel.Factory
             )
 
-            Content(foodIntakeViewModel)
+            Content(model)
         }
     }
 }
 
 @Composable
 private fun Content(
-    foodIntakeViewModel: FoodIntakeViewModel
+    model: FoodIntakeViewModel
 ) {
     DiabeticLayout { innerPadding ->
         Column(
@@ -70,15 +70,15 @@ private fun Content(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            val state = foodIntakeViewModel.state.collectAsState()
+            val state = model.state.collectAsState()
 
             FoodIntakeInput(
                 state.value,
-                foodIntakeViewModel::changeGlucoseLevel,
-                foodIntakeViewModel::changeBreadUnit,
-                foodIntakeViewModel::changeCarbohydrate,
-                foodIntakeViewModel::addFoodIntake,
-                foodIntakeViewModel::flushError
+                model::changeGlucoseLevel,
+                model::changeBreadUnit,
+                model::changeCarbohydrate,
+                model::addFoodIntake,
+                model::flushError
             )
         }
     }
@@ -93,10 +93,6 @@ private fun FoodIntakeInput(
     onSave: () -> Unit,
     onErrorShown: () -> Unit
 ) {
-    val space = @Composable {
-        Spacer(modifier = Modifier.size(20.dp))
-    }
-
     if (state.error.isNotEmpty()) {
         Toast
             .makeText(LocalContext.current, state.error, Toast.LENGTH_LONG)
@@ -104,18 +100,26 @@ private fun FoodIntakeInput(
         onErrorShown()
     }
 
-    if (state.isSaved) {
-        Text(
-            text = "Количество инсулина, которое вам необходимо принять",
-            fontSize = 4.em,
-            textAlign = TextAlign.Center
-        )
-        Text(
-            text = state.calculatedInsulin!!.value.toString(),
-            fontSize = 10.em,
-            fontWeight = FontWeight.Bold
-        )
-        return
+    if (state.isSaved) InsulinView(state)
+    else AddFoodIntakeForm(
+        state,
+        onGlucoseLevelChange,
+        onBreadUnitChange,
+        onCarbohydrate,
+        onSave
+    )
+}
+
+@Composable
+private fun AddFoodIntakeForm(
+    state: FoodIntakeState,
+    onGlucoseLevelChange: (String) -> Unit,
+    onBreadUnitChange: (String) -> Unit,
+    onCarbohydrate: (String) -> Unit,
+    onSave: () -> Unit,
+) {
+    val space = @Composable {
+        Spacer(modifier = Modifier.size(20.dp))
     }
 
     OutlinedTextField(
@@ -167,6 +171,20 @@ private fun FoodIntakeInput(
     FilledTonalButton(onClick = onSave) {
         Text(text = "Добавить")
     }
+}
+
+@Composable
+private fun InsulinView(state: FoodIntakeState) {
+    Text(
+        text = "Количество инсулина, которое вам необходимо принять",
+        fontSize = 4.em,
+        textAlign = TextAlign.Center
+    )
+    Text(
+        text = state.calculatedInsulin!!.value.toString(),
+        fontSize = 10.em,
+        fontWeight = FontWeight.Bold
+    )
 }
 
 private class FoodIntakeViewModel(
@@ -303,6 +321,26 @@ private data class FoodIntakeState(
     val isSaved: Boolean = false,
     val calculatedInsulin: Insulin? = null
 ) {
+}
+
+@Preview
+@Composable
+private fun ContentFormPreview() {
+    val foodIntakeRepository = StubFoodIntakeRepository()
+    val carbohydrateStorage = StubCarbohydrateStorage()
+
+    Content(
+        FoodIntakeViewModel(
+            StubCarbohydrateStorage(),
+            BeginFoodIntake.Handler(foodIntakeRepository),
+            AddCarbohydrate.Handler(carbohydrateStorage),
+            CalculateInsulinBeforeFoodIntake.Handler(
+                foodIntakeRepository,
+                carbohydrateStorage
+            ),
+            FoodIntakeState()
+        )
+    )
 }
 
 @Preview

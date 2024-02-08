@@ -29,7 +29,7 @@ import com.diabetic.ui.screen.StatisticActivity
 import kotlin.reflect.KClass
 
 @Composable
-fun BottomBar() {
+internal fun BottomBar() {
     BottomAppBar {
         Row(
             Modifier.fillMaxSize(),
