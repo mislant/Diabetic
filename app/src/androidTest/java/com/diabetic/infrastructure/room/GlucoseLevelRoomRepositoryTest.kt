@@ -57,7 +57,7 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
         }
         prepared.forEach { repository.persist(it) }
 
-        val currents = repository.fetchAll()
+        val currents = repository.fetch()
 
         assertEquals(3, currents.count())
         for (i in prepared.indices) {
@@ -90,7 +90,7 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
             ).also { repository.persist(it) }
         }
 
-        val fetched = repository.fetchRange(
+        val fetched = repository.fetch(
             DateTime.fromString("2024-01-01 00:00:00.000").localDataTime(),
             DateTime.fromString("2024-01-02 02:00:00.000").localDataTime()
         )

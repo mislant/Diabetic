@@ -5,11 +5,11 @@ import com.diabetic.domain.model.GlucoseLevelRepository
 import java.time.LocalDateTime
 
 class StubGlucoseLevelRepository : InMemoryStorage<GlucoseLevel>(), GlucoseLevelRepository {
-    override fun fetchAll(): List<GlucoseLevel> {
+    override fun fetch(): List<GlucoseLevel> {
         return storage.toList()
     }
 
-    override fun fetchRange(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
+    override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
         return storage.toList().filter {
             it.date.localDataTime() > from &&
                     it.date.localDataTime() < to

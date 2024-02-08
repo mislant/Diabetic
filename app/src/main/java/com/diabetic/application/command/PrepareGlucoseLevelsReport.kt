@@ -19,7 +19,7 @@ class PrepareGlucoseLevelsReport {
     ) {
         fun handle(command: Command): File {
             val range = ReportMeta.Range(Pair(command.from, command.to))
-            val glucoseLevels = repository.fetchRange(
+            val glucoseLevels = repository.fetch(
                 range.from,
                 range.to
             )

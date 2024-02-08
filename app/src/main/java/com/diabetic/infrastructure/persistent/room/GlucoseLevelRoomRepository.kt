@@ -7,11 +7,11 @@ import com.diabetic.domain.model.iso
 import java.time.LocalDateTime
 
 class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDAO) : GlucoseLevelRepository {
-    override fun fetchAll(): List<GlucoseLevel> {
+    override fun fetch(): List<GlucoseLevel> {
         return dao.all().map { it.cast() }
     }
 
-    override fun fetchRange(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
+    override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
         return dao.all(from.iso(), to.iso()).map { it.cast() }
     }
 
