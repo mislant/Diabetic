@@ -40,6 +40,7 @@ import com.diabetic.domain.model.Insulin
 import com.diabetic.infrastructure.persistent.stub.StubCarbohydrateStorage
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import com.diabetic.ui.ServiceLocator
+import com.diabetic.ui.screen.component.DiabeticLayout
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -166,29 +167,6 @@ private fun FoodIntakeInput(
     FilledTonalButton(onClick = onSave) {
         Text(text = "Добавить")
     }
-}
-
-@Preview
-@Composable
-private fun ContentPreview() {
-    val foodIntakeRepository = StubFoodIntakeRepository()
-    val carbohydrateStorage = StubCarbohydrateStorage()
-
-    Content(
-        FoodIntakeViewModel(
-            StubCarbohydrateStorage(),
-            BeginFoodIntake.Handler(foodIntakeRepository),
-            AddCarbohydrate.Handler(carbohydrateStorage),
-            CalculateInsulinBeforeFoodIntake.Handler(
-                foodIntakeRepository,
-                carbohydrateStorage
-            ),
-            FoodIntakeState(
-                isSaved = true,
-                calculatedInsulin = Insulin(2.2F)
-            )
-        )
-    )
 }
 
 private class FoodIntakeViewModel(
@@ -325,4 +303,27 @@ private data class FoodIntakeState(
     val isSaved: Boolean = false,
     val calculatedInsulin: Insulin? = null
 ) {
+}
+
+@Preview
+@Composable
+private fun ContentPreview() {
+    val foodIntakeRepository = StubFoodIntakeRepository()
+    val carbohydrateStorage = StubCarbohydrateStorage()
+
+    Content(
+        FoodIntakeViewModel(
+            StubCarbohydrateStorage(),
+            BeginFoodIntake.Handler(foodIntakeRepository),
+            AddCarbohydrate.Handler(carbohydrateStorage),
+            CalculateInsulinBeforeFoodIntake.Handler(
+                foodIntakeRepository,
+                carbohydrateStorage
+            ),
+            FoodIntakeState(
+                isSaved = true,
+                calculatedInsulin = Insulin(2.2F)
+            )
+        )
+    )
 }
