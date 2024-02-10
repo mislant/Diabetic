@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,12 +33,14 @@ import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
+import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class AddGlucoseAfterFoodIntake : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             val model = viewModel<AddGlucoseAfterFoodIntakeViewModel>(
                 factory = AddGlucoseAfterFoodIntakeViewModel.Factory
@@ -53,47 +56,49 @@ private fun Content(model: AddGlucoseAfterFoodIntakeViewModel) {
     val state = model.state.collectAsState()
     val ctx = LocalContext.current
 
-    if (state.value.error.isNotEmpty()) {
-        Toast
-            .makeText(
-                LocalContext.current,
-                state.value.error,
-                Toast.LENGTH_LONG
-            )
-            .show()
-        model.flushError()
-    }
+    DiabeticMaterialTheme {
+        if (state.value.error.isNotEmpty()) {
+            Toast
+                .makeText(
+                    LocalContext.current,
+                    state.value.error,
+                    Toast.LENGTH_LONG
+                )
+                .show()
+            model.flushError()
+        }
 
-    DiabeticLayout { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            OutlinedTextField(
-                value = state.value.glucoseLevel,
-                singleLine = true,
-                onValueChange = model::changeGlucoseLevel,
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Bloodtype,
-                        contentDescription = null
-                    )
-                },
-                placeholder = { Text(text = "Уровень глюкозы") },
-                label = { Text(text = "Уровень глюкозы") },
-            )
-            Spacer(modifier = Modifier.size(20.dp))
-            FilledTonalButton(onClick = {
-                model.addLevel().onSuccess {
-                    Intent(ctx, MainActivity::class.java).also {
-                        ctx.startActivity(it)
+        DiabeticLayout { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                OutlinedTextField(
+                    value = state.value.glucoseLevel,
+                    singleLine = true,
+                    onValueChange = model::changeGlucoseLevel,
+                    leadingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Bloodtype,
+                            contentDescription = null
+                        )
+                    },
+                    placeholder = { Text(text = "Уровень глюкозы") },
+                    label = { Text(text = "Уровень глюкозы") },
+                )
+                Spacer(modifier = Modifier.size(20.dp))
+                FilledTonalButton(onClick = {
+                    model.addLevel().onSuccess {
+                        Intent(ctx, MainActivity::class.java).also {
+                            ctx.startActivity(it)
+                        }
                     }
+                }) {
+                    Text(text = "Добавить")
                 }
-            }) {
-                Text(text = "Добавить")
             }
         }
     }

@@ -5,6 +5,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.material.icons.filled.Co2
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,6 +43,7 @@ import com.diabetic.infrastructure.persistent.stub.StubCarbohydrateStorage
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
+import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -48,6 +51,7 @@ import kotlinx.coroutines.flow.asStateFlow
 class AddFoodIntakeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             val model = viewModel<FoodIntakeViewModel>(
                 factory = FoodIntakeViewModel.Factory
@@ -62,24 +66,26 @@ class AddFoodIntakeActivity : ComponentActivity() {
 private fun Content(
     model: FoodIntakeViewModel
 ) {
-    DiabeticLayout { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val state = model.state.collectAsState()
+    DiabeticMaterialTheme {
+        DiabeticLayout { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                val state = model.state.collectAsState()
 
-            FoodIntakeInput(
-                state.value,
-                model::changeGlucoseLevel,
-                model::changeBreadUnit,
-                model::changeCarbohydrate,
-                model::addFoodIntake,
-                model::flushError
-            )
+                FoodIntakeInput(
+                    state.value,
+                    model::changeGlucoseLevel,
+                    model::changeBreadUnit,
+                    model::changeCarbohydrate,
+                    model::addFoodIntake,
+                    model::flushError
+                )
+            }
         }
     }
 }
@@ -177,12 +183,12 @@ private fun AddFoodIntakeForm(
 private fun InsulinView(state: FoodIntakeState) {
     Text(
         text = "Количество инсулина, которое вам необходимо принять",
-        fontSize = 4.em,
-        textAlign = TextAlign.Center
+        textAlign = TextAlign.Center,
+        style = MaterialTheme.typography.titleLarge
     )
     Text(
         text = state.calculatedInsulin!!.value.toString(),
-        fontSize = 10.em,
+        style = MaterialTheme.typography.displayLarge,
         fontWeight = FontWeight.Bold
     )
 }

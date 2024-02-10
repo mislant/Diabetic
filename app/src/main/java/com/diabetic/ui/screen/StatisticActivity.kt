@@ -4,7 +4,9 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,7 @@ import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
@@ -37,6 +40,7 @@ import com.diabetic.domain.model.GlucoseLevelRepository
 import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
+import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import java.time.Instant
@@ -46,6 +50,7 @@ import java.time.ZoneId
 class StatisticActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
         setContent {
             val model = viewModel<StatisticsViewModel>(factory = StatisticsViewModel.Factory)
 
@@ -58,21 +63,23 @@ class StatisticActivity : ComponentActivity() {
 private fun Content(model: StatisticsViewModel) {
     val state = model.state.collectAsState()
 
-    DiabeticLayout(topBarContent = { TopBar() }) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .padding(innerPadding)
-                .fillMaxSize(),
-        ) {
-            Row(horizontalArrangement = Arrangement.End) {
-                DateFilterInput(model::filterGlucoseLevels)
-            }
+    DiabeticMaterialTheme {
+        DiabeticLayout(topBarContent = { TopBar() }) { innerPadding ->
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 3.dp)
+                    .padding(innerPadding)
+                    .fillMaxSize(),
             ) {
-                GlucoseLevelsTable(state.value.glucoseLevels)
+                Row(horizontalArrangement = Arrangement.End) {
+                    DateFilterInput(model::filterGlucoseLevels)
+                }
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 3.dp)
+                ) {
+                    GlucoseLevelsTable(state.value.glucoseLevels)
+                }
             }
         }
     }
@@ -134,7 +141,7 @@ private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
                 text = text,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                fontSize = 3.4.em,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
                     .weight(weight)
             )
@@ -157,7 +164,7 @@ private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
                     Text(
                         text = text,
                         textAlign = TextAlign.Center,
-                        fontSize = 4.em,
+                        style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier
                             .weight(weight)
                     )

@@ -15,7 +15,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -26,11 +28,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.diabetic.ui.screen.MainActivity
 import com.diabetic.ui.screen.StatisticActivity
+import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlin.reflect.KClass
 
 @Composable
 internal fun BottomBar() {
-    BottomAppBar {
+    BottomAppBar(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onBackground,
+        windowInsets = BottomAppBarDefaults.windowInsets
+    ) {
         Row(
             Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.Center
@@ -38,7 +45,7 @@ internal fun BottomBar() {
             Row(
                 Modifier
                     .fillMaxHeight()
-                    .width(200.dp),
+                    .width(240.dp),
                 Arrangement.SpaceAround
             ) {
                 BottomButton(
@@ -68,7 +75,7 @@ private fun BottomButton(
     Column(
         modifier
             .fillMaxHeight()
-            .width(80.dp)
+            .width(105.dp)
             .clickable {
                 if (ctx.getCurrentActivity()!!::class == toActivity) {
                     return@clickable
@@ -86,7 +93,7 @@ private fun BottomButton(
             imageVector = icon,
             contentDescription = null
         )
-        Text(text)
+        Text(text, style = MaterialTheme.typography.labelLarge)
     }
 }
 
@@ -100,5 +107,7 @@ private fun Context.getCurrentActivity(): ComponentActivity? {
 @Preview
 @Composable
 private fun BottomBarPreview() {
-    BottomBar()
+    DiabeticMaterialTheme {
+        BottomBar()
+    }
 }

@@ -62,6 +62,7 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation("androidx.compose.runtime:runtime-livedata:1.6.0")
+    implementation("androidx.compose.ui:ui-text-google-fonts:1.6.1")
 
     val apache_poi_version = "5.2.5"
     implementation("org.apache.poi:poi:$apache_poi_version")
