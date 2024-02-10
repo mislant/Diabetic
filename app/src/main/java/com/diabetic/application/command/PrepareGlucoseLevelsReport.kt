@@ -1,42 +1,60 @@
 package com.diabetic.application.command
 
 import com.diabetic.domain.model.GlucoseLevelRepository
-import com.diabetic.domain.model.readable
+import com.diabetic.domain.model.readableDate
 import com.diabetic.domain.service.ReportMeta
 import com.diabetic.domain.service.excel
-import java.io.File
+import java.io.OutputStream
 import java.time.LocalDateTime
 
 class PrepareGlucoseLevelsReport {
-    class Command(
-        val from: LocalDateTime,
-        val to: LocalDateTime,
+    data class GenerateFileNameCommand(
+        val range: Pair<LocalDateTime, LocalDateTime>?
+    )
+
+    data class WriteReportCommand(
+        val range: Pair<LocalDateTime, LocalDateTime>?,
+        val stream: OutputStream
     )
 
     class Handler(
         private val repository: GlucoseLevelRepository,
-        private val storage: ExcelReportStorage
     ) {
-        fun handle(command: Command): File {
-            val range = ReportMeta.Range(Pair(command.from, command.to))
-            val glucoseLevels = repository.fetch(
-                range.from,
-                range.to
-            )
 
-            val report = "Glucose_report.${command.from.readable()}-${command.to.readable()}"
-                .replace(' ', '_')
-            val meta = ReportMeta(range)
+        fun handle(command: GenerateFileNameCommand): String {
+            val range = command.range
 
-            return storage.new(report).apply {
-                outputStream()
-                    .excel(glucoseLevels, meta)
-                    .close()
+            val template = "Glucose_level_report.%s.xlsx"
+            return if (range == null) {
+                template.format("for_all_time")
+            } else {
+                template.format(
+                    "${range.from.readableDate()}_${range.to.readableDate()}"
+                )
             }
         }
-    }
 
-    interface ExcelReportStorage {
-        fun new(name: String): File
+        fun handle(command: WriteReportCommand) {
+            val levels = repository.run {
+                if (command.range === null) fetch() else fetch(
+                    command.range.from,
+                    command.range.to
+                )
+            }
+
+
+            val meta = ReportMeta(
+                range = if (command.range == null) null else ReportMeta.Range(
+                    command.range
+                )
+            )
+
+            return command.stream
+                .excel(levels, meta)
+                .close()
+        }
+
+        private val Pair<LocalDateTime, LocalDateTime>.from: LocalDateTime get() = this.first
+        private val Pair<LocalDateTime, LocalDateTime>.to: LocalDateTime get() = this.second
     }
 }

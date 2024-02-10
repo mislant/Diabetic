@@ -9,7 +9,6 @@ import com.diabetic.application.command.CalculateInsulinBeforeFoodIntake
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.CarbohydrateStorage
 import com.diabetic.domain.model.GlucoseLevelRepository
-import com.diabetic.infrastructure.persistent.file.android.InternalExcelReportStorage
 import com.diabetic.infrastructure.persistent.room.AppDatabase
 import com.diabetic.infrastructure.persistent.room.CarbohydrateDataStoreStorage
 import com.diabetic.infrastructure.persistent.room.FoodIntakeRoomRepository
@@ -21,7 +20,6 @@ object ServiceLocator {
 
     fun init(ctx: Context) {
         initDb(ctx)
-        initReportStorage(ctx)
     }
 
     private fun initDb(ctx: Context) {
@@ -34,13 +32,6 @@ object ServiceLocator {
             .build()
 
         container[AppDatabase::class] = db
-    }
-
-    private fun initReportStorage(ctx: Context) {
-        container[PrepareGlucoseLevelsReport.ExcelReportStorage::class] =
-            InternalExcelReportStorage(
-                ctx.filesDir
-            )
     }
 
     fun glucoseLevelRepository(): GlucoseLevelRepository {
@@ -58,7 +49,6 @@ object ServiceLocator {
     fun prepareGlucoseLevelReport(): PrepareGlucoseLevelsReport.Handler {
         return PrepareGlucoseLevelsReport.Handler(
             glucoseLevelRepository(),
-            get(PrepareGlucoseLevelsReport.ExcelReportStorage::class)
         )
     }
 

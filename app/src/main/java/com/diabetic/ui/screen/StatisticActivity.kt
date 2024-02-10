@@ -1,39 +1,49 @@
 package com.diabetic.ui.screen
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
@@ -43,24 +53,51 @@ import com.diabetic.ui.screen.component.DiabeticLayout
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import java.io.OutputStream
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 
 class StatisticActivity : ComponentActivity() {
+    private val model: StatisticsViewModel by viewModels(
+        factoryProducer = { StatisticsViewModel.Factory }
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
+        val createReportContract =
+            object : ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+                override fun createIntent(context: Context, input: String): Intent {
+                    return super.createIntent(context, input)
+                        .addCategory(Intent.CATEGORY_OPENABLE)
+                }
+            }
+
+        val launcher = registerForActivityResult(createReportContract) {
+            if (it === null) {
+                return@registerForActivityResult
+            }
+
+            val stream = contentResolver.openOutputStream(it)
+            if (stream === null) {
+                return@registerForActivityResult
+            }
+
+            model.generateReport(stream)
+        }
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        setContent {
-            val model = viewModel<StatisticsViewModel>(factory = StatisticsViewModel.Factory)
 
-            Content(model)
+        setContent {
+            Content(model) {
+                launcher.launch(model.generateFileName())
+            }
         }
     }
 }
 
 @Composable
-private fun Content(model: StatisticsViewModel) {
+private fun Content(model: StatisticsViewModel, saveFile: () -> Unit) {
     val state = model.state.collectAsState()
 
     DiabeticMaterialTheme {
@@ -75,10 +112,30 @@ private fun Content(model: StatisticsViewModel) {
                 }
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 3.dp)
+                        .fillMaxWidth()
+                        .fillMaxHeight(0.88F)
+                        .padding(horizontal = 7.dp)
                 ) {
                     GlucoseLevelsTable(state.value.glucoseLevels)
+                }
+                Divider(modifier = Modifier.padding())
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(end = 20.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    OutlinedButton(onClick = saveFile) {
+                        Icon(
+                            imageVector = Icons.Default.Summarize,
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = "Excel"
+                        )
+                    }
                 }
             }
         }
@@ -187,11 +244,13 @@ private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
 }
 
 private data class StatisticsViewModelState(
-    val glucoseLevels: List<GlucoseLevel> = listOf()
+    val glucoseLevels: List<GlucoseLevel> = listOf(),
+    val range: LongRange? = null
 )
 
 private class StatisticsViewModel(
-    val glucoseLevelRepository: GlucoseLevelRepository
+    private val glucoseLevelRepository: GlucoseLevelRepository,
+    private val handler: PrepareGlucoseLevelsReport.Handler
 ) : ViewModel() {
     private val _state = MutableStateFlow(StatisticsViewModelState())
     val state = _state.asStateFlow()
@@ -205,7 +264,8 @@ private class StatisticsViewModel(
     fun filterGlucoseLevels(from: Long?, to: Long?) {
         if (from == null && to == null) {
             _state.value = _state.value.copy(
-                glucoseLevels = glucoseLevelRepository.fetch()
+                glucoseLevels = glucoseLevelRepository.fetch(),
+                range = null
             )
         }
 
@@ -217,7 +277,32 @@ private class StatisticsViewModel(
             glucoseLevels = glucoseLevelRepository.fetch(
                 from.toLocalDateTime(),
                 to.toLocalDateTime()
+            ),
+            range = LongRange(from, to)
+        )
+    }
+
+    fun generateFileName(): String {
+        return handler.handle(
+            PrepareGlucoseLevelsReport.GenerateFileNameCommand(
+                _state.value.range?.toLocalDateTimePair()
             )
+        )
+    }
+
+    fun generateReport(stream: OutputStream) {
+        return handler.handle(
+            PrepareGlucoseLevelsReport.WriteReportCommand(
+                _state.value.range?.toLocalDateTimePair(),
+                stream
+            )
+        )
+    }
+
+    private fun LongRange.toLocalDateTimePair(): Pair<LocalDateTime, LocalDateTime> {
+        return Pair(
+            start.toLocalDateTime(),
+            endInclusive.toLocalDateTime()
         )
     }
 
@@ -232,7 +317,8 @@ private class StatisticsViewModel(
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return StatisticsViewModel(
-                    ServiceLocator.glucoseLevelRepository()
+                    ServiceLocator.glucoseLevelRepository(),
+                    ServiceLocator.prepareGlucoseLevelReport()
                 ) as T
             }
         }
@@ -242,20 +328,22 @@ private class StatisticsViewModel(
 @Preview
 @Composable
 private fun ContextPreview() {
-    val model = StatisticsViewModel(
-        StubGlucoseLevelRepository().apply {
-            List(30) { id ->
-                GlucoseLevel(
-                    GlucoseLevel.MeasureType.BEFORE_MEAL,
-                    GlucoseLevel.Value(1.2F),
-                    DateTime(),
-                    id
-                ).also { persist(it) }
-            }
+    val repository = StubGlucoseLevelRepository().apply {
+        List(30) { id ->
+            GlucoseLevel(
+                GlucoseLevel.MeasureType.BEFORE_MEAL,
+                GlucoseLevel.Value(1.2F),
+                DateTime(),
+                id
+            ).also { persist(it) }
         }
+    }
+    val model = StatisticsViewModel(
+        repository,
+        PrepareGlucoseLevelsReport.Handler(repository)
     )
 
-    Content(model)
+    Content(model) {}
 }
 
 @Preview

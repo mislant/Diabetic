@@ -57,9 +57,13 @@ class Reporter {
         }
         title.cellStyle = style
         title.setCellValue(
-            "Показатели глюкозы с ${
-                meta.range.from.readable()
-            } по ${meta.range.to.readable()}"
+            "Показатели глюкозы %s ".format(
+                if (meta.range == null) {
+                    "за все время"
+                } else {
+                    "с ${meta.range.from.readable()} по ${meta.range.to.readable()}"
+                }
+            )
         )
     }
 
@@ -129,7 +133,7 @@ class Reporter {
 }
 
 data class ReportMeta(
-    val range: Range
+    val range: Range?
 ) {
     @JvmInline
     value class Range(private val range: Pair<LocalDateTime, LocalDateTime>) {
