@@ -35,7 +35,7 @@ import kotlin.reflect.KClass
 internal fun BottomBar() {
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.primary,
-        contentColor = MaterialTheme.colorScheme.onBackground,
+        contentColor = MaterialTheme.colorScheme.onPrimary,
         windowInsets = BottomAppBarDefaults.windowInsets
     ) {
         Row(
