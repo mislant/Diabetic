@@ -167,10 +167,10 @@ private fun AddFoodIntakeForm(
             )
         },
         placeholder = {
-            Text(text = "Углеводородный индекс")
+            Text(text = "Углеводный коэффицент")
         },
         label = {
-            Text(text = "Углеводородный индекс")
+            Text(text = "Углеводный коэффицент")
         }
     )
     space()
