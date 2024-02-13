@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material3.DateRangePicker
@@ -65,7 +66,8 @@ class StatisticActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val createReportContract =
-            object : ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
+            object :
+                ActivityResultContracts.CreateDocument("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
                 override fun createIntent(context: Context, input: String): Intent {
                     return super.createIntent(context, input)
                         .addCategory(Intent.CATEGORY_OPENABLE)
@@ -211,7 +213,7 @@ private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
     }
     Divider(modifier = Modifier.padding(vertical = 2.dp))
     LazyColumn {
-        items(glucoseLevels) { level ->
+        itemsIndexed(glucoseLevels) { index, level ->
             Row(
                 Modifier
                     .fillMaxWidth()
@@ -227,13 +229,14 @@ private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
                     )
                 }
 
-                text(level.id.toString(), 0.1F)
+                text((index + 1).toString(), 0.1F)
                 text(level.value.level.toString(), 0.2F)
                 text(level.date.format().readable(), 0.35F)
                 text(
                     when (level.type) {
                         GlucoseLevel.MeasureType.BEFORE_MEAL -> "До"
                         GlucoseLevel.MeasureType.AFTER_MEAL -> "После"
+                        GlucoseLevel.MeasureType.UNSPECIFIED -> "-"
                     },
                     0.25F
                 )

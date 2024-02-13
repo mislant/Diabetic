@@ -17,18 +17,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.diabetic.ui.screen.component.DiabeticLayout
 import com.diabetic.ui.theme.DiabeticMaterialTheme
+import kotlin.reflect.KClass
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,8 +41,6 @@ class MainActivity : ComponentActivity() {
 @Composable
 private fun Content() {
     DiabeticMaterialTheme {
-        val ctx = LocalContext.current
-
         DiabeticLayout { innerPadding ->
             Column(
                 Modifier
@@ -53,47 +49,45 @@ private fun Content() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9F)
-                        .height(60.dp),
-                    onClick = {
-                        Intent(ctx, AddFoodIntakeActivity::class.java).also {
-                            ctx.startActivity(it)
-                        }
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Text(
-                        text = "Добавить прием пищи",
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                MainActionButton(
+                    test = "Добавить прием пищи",
+                    activity = AddFoodIntakeActivity::class
+                )
                 Spacer(modifier = Modifier.size(20.dp))
-                Button(
-                    modifier = Modifier
-                        .fillMaxWidth(0.9F)
-                        .height(60.dp),
-                    onClick = {
-                        Intent(ctx, AddGlucoseAfterFoodIntake::class.java)
-                            .also { ctx.startActivity(it) }
-                    },
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
-                ) {
-                    Text(
-                        text = "Добавить уровень глюкозы \nпосле приема пищи",
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
+                MainActionButton(
+                    test = "Добавить уровень глюкозы",
+                    activity = AddGlucoseActivity::class
+                )
             }
         }
+    }
+}
+
+@Composable
+private fun MainActionButton(
+    test: String,
+    activity: KClass<out ComponentActivity>
+) {
+    val ctx = LocalContext.current
+
+    Button(
+        modifier = Modifier
+            .fillMaxWidth(0.9F)
+            .height(60.dp),
+        onClick = {
+            Intent(ctx, activity.java).also {
+                ctx.startActivity(it)
+            }
+        },
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Text(
+            text = test,
+            color = MaterialTheme.colorScheme.onSurface
+        )
     }
 }
 

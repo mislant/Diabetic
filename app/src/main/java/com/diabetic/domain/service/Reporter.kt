@@ -125,6 +125,7 @@ class Reporter {
                     when (glucoseLevel.type) {
                         GlucoseLevel.MeasureType.BEFORE_MEAL -> "До"
                         GlucoseLevel.MeasureType.AFTER_MEAL -> "После"
+                        GlucoseLevel.MeasureType.UNSPECIFIED -> "-"
                     }
                 )
             }

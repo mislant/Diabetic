@@ -10,7 +10,7 @@ class StubFoodIntakeRepository : InMemoryStorage<FoodIntake>(), FoodIntakeReposi
         return foodIntake
     }
 
-    override fun getById(id: Int): FoodIntake? {
+    override fun fetch(id: Int): FoodIntake? {
         return storage.find {
             it.id == id
         }

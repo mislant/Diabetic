@@ -2,5 +2,5 @@ package com.diabetic.domain.model
 
 interface FoodIntakeRepository {
     fun persist(foodIntake: FoodIntake): FoodIntake
-    fun getById(id: Int): FoodIntake?
+    fun fetch(id: Int): FoodIntake?
 }

@@ -24,12 +24,12 @@ class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDAO) : GlucoseLeve
             )
         )
     }
-}
 
-private fun GlucoseLevelEntity.cast() = GlucoseLevel(
-    id = id,
-    type = GlucoseLevel.MeasureType.from(measureType),
-    value = GlucoseLevel.Value(value),
-    date = DateTime.fromString(date)
-)
+    private fun GlucoseLevelEntity.cast() = GlucoseLevel(
+        id = id,
+        type = GlucoseLevel.MeasureType.from(measureType),
+        value = GlucoseLevel.Value(value),
+        date = DateTime.fromString(date)
+    )
+}
 
