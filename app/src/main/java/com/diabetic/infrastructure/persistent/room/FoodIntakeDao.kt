@@ -11,4 +11,7 @@ interface FoodIntakeDao {
 
     @Query("SELECT * FROM food_intake WHERE id=:id")
     fun fetch(id: Int): FoodIntakeEntity?
+
+    @Query("SELECT * FROM food_intake")
+    fun fetch(): List<FoodIntakeEntity>
 }

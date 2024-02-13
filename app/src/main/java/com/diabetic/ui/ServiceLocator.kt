@@ -7,6 +7,7 @@ import com.diabetic.application.command.AddGlucoseLevel
 import com.diabetic.application.command.BeginFoodIntake
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.CarbohydrateStorage
+import com.diabetic.domain.model.FoodIntakeRepository
 import com.diabetic.domain.model.GlucoseLevelRepository
 import com.diabetic.infrastructure.persistent.room.AppDatabase
 import com.diabetic.infrastructure.persistent.room.CarbohydrateDataStoreStorage
@@ -53,9 +54,13 @@ object ServiceLocator {
 
     fun beginFoodIntakeHandler(): BeginFoodIntake.Handler {
         return BeginFoodIntake.Handler(
-            FoodIntakeRoomRepository(get(AppDatabase::class).foodIntakeDao()),
+            foodIntakeRepository(),
             carbohydrateStorage()
         )
+    }
+
+    fun foodIntakeRepository(): FoodIntakeRepository {
+        return FoodIntakeRoomRepository(get(AppDatabase::class).foodIntakeDao())
     }
 
     fun addCarbohydrateHandler(): AddCarbohydrate.Handler {

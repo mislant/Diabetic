@@ -18,6 +18,10 @@ class FoodIntakeRoomRepository(private val dao: FoodIntakeDao) : FoodIntakeRepos
         return dao.fetch(id)?.cast()
     }
 
+    override fun fetch(): List<FoodIntake> {
+        return dao.fetch().map { it.cast() }
+    }
+
     private fun FoodIntake.entity(): FoodIntakeEntity = FoodIntakeEntity(
         breadUnit = breadUnit.value,
         insulin = insulin.value,

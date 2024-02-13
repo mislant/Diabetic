@@ -15,4 +15,8 @@ class StubFoodIntakeRepository : InMemoryStorage<FoodIntake>(), FoodIntakeReposi
             it.id == id
         }
     }
+
+    override fun fetch(): List<FoodIntake> {
+        return storage.toList()
+    }
 }

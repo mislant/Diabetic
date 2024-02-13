@@ -21,7 +21,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,9 +36,14 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
+import com.diabetic.domain.model.BreadUnit
 import com.diabetic.domain.model.DateTime
+import com.diabetic.domain.model.FoodIntake
+import com.diabetic.domain.model.FoodIntakeRepository
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
+import com.diabetic.domain.model.ShortInsulin
+import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
@@ -93,17 +101,32 @@ private fun Content(model: StatisticsViewModel, saveFile: () -> Unit) {
     val state = model.state.collectAsState()
 
     DiabeticMaterialTheme {
-        DiabeticLayout(topBarContent = { TopBar() }) { innerPadding ->
+        DiabeticLayout(topBarContent = {
+            TopBar(
+                state.value.page,
+                model::switchReport
+            )
+        }) { innerPadding ->
             Column(
                 modifier = Modifier
                     .padding(innerPadding)
                     .fillMaxSize(),
             ) {
-                DateRangeFilter(model::filterGlucoseLevels)
-                GlucoseLevelsTable(state.value.glucoseLevels)
-                Divider(modifier = Modifier.padding())
-                ExportButton {
-                    saveFile()
+                when (state.value.page) {
+                    Page.GLUCOSE -> {
+                        DateRangeFilter(model::filterGlucoseLevels)
+                        GlucoseLevelsTable(state.value.glucoseLevels)
+                        Divider(modifier = Modifier.padding())
+                        ExportButton {
+                            saveFile()
+                        }
+                    }
+
+                    Page.FOOD_INTAKES -> {
+                        FoodIntakeTable(state.value.foodIntakes)
+                    }
+
+                    else -> {}
                 }
             }
         }
@@ -111,14 +134,45 @@ private fun Content(model: StatisticsViewModel, saveFile: () -> Unit) {
 }
 
 @Composable
-private fun TopBar() {
-    Text(
-        text = "Отчет",
-        modifier = Modifier
-            .fillMaxWidth(0.95F)
-            .padding(horizontal = 10.dp, vertical = 5.dp),
-        textAlign = TextAlign.Center
-    )
+private fun TopBar(page: Page, switchPage: (Page) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(0.95F)
+    ) {
+        Text(
+            text = "Отчет",
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 10.dp, vertical = 5.dp),
+            textAlign = TextAlign.Center,
+        )
+
+        val names = listOf(
+            Pair(Page.GLUCOSE, "По глюкозе"),
+            Pair(Page.FOOD_INTAKES, "По приемам пищи")
+        )
+
+        TabRow(
+            containerColor = MaterialTheme.colorScheme.background,
+            selectedTabIndex = names.indexOf(
+                names.find { it.first == page }
+            )
+        ) {
+            names.forEachIndexed { index, name ->
+                Tab(
+                    selected = index == names.indexOf(
+                        names.find { it.first == page }
+                    ),
+                    onClick = { switchPage(name.first) }
+                ) {
+                    Text(
+                        text = name.second,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(bottom = 5.dp)
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -163,6 +217,36 @@ private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
 }
 
 @Composable
+private fun FoodIntakeTable(foodIntakes: List<FoodIntake>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.88F)
+            .padding(horizontal = 7.dp)
+    ) {
+        Table(
+            headers = listOf(
+                "#", "Инсулин", "Хлебные единицы", "Дата"
+            ),
+            elements = foodIntakes.mapIndexed() { i, foodIntake ->
+                listOf(
+                    (i + 1).toString(),
+                    foodIntake.insulin.value.toString(),
+                    foodIntake.breadUnit.value.toString(),
+                    foodIntake.date.format().readableDate()
+                )
+            },
+            weights = floatArrayOf(
+                .1F,
+                .25F,
+                .25F,
+                .35F,
+            )
+        )
+    }
+}
+
+@Composable
 private fun ExportButton(saveFile: () -> Unit) {
     Divider(modifier = Modifier.padding())
     Row(
@@ -185,22 +269,45 @@ private fun ExportButton(saveFile: () -> Unit) {
     }
 }
 
+private enum class Page {
+    GLUCOSE,
+    INSULIN,
+    FOOD_INTAKES
+}
+
 private data class StatisticsViewModelState(
     val glucoseLevels: List<GlucoseLevel> = listOf(),
-    val range: LongRange? = null
-)
+    val foodIntakes: List<FoodIntake> = listOf(),
+    val range: LongRange? = null,
+    val page: Page = Page.GLUCOSE
+) {
+}
 
 private class StatisticsViewModel(
     private val glucoseLevelRepository: GlucoseLevelRepository,
-    private val handler: PrepareGlucoseLevelsReport.Handler
+    private val foodIntakeRepository: FoodIntakeRepository,
+    private val handler: PrepareGlucoseLevelsReport.Handler,
+    initial: StatisticsViewModelState = StatisticsViewModelState()
 ) : ViewModel() {
-    private val _state = MutableStateFlow(StatisticsViewModelState())
+    private val _state = MutableStateFlow(initial)
     val state = _state.asStateFlow()
 
     init {
-        _state.value = _state.value.copy(
-            glucoseLevels = glucoseLevelRepository.fetch()
-        )
+        when (_state.value.page) {
+            Page.GLUCOSE -> {
+                _state.value = _state.value.copy(
+                    glucoseLevels = glucoseLevelRepository.fetch()
+                )
+            }
+
+            Page.FOOD_INTAKES -> {
+                _state.value = _state.value.copy(
+                    foodIntakes = foodIntakeRepository.fetch()
+                )
+            }
+
+            else -> {}
+        }
     }
 
     fun filterGlucoseLevels(from: Long?, to: Long?) {
@@ -254,12 +361,40 @@ private class StatisticsViewModel(
             .toLocalDateTime()
     }
 
+    fun switchReport(selected: Page) {
+        _state.value = when (selected) {
+            Page.GLUCOSE -> {
+                _state.value.copy(
+                    page = selected,
+                    range = null,
+                    glucoseLevels = glucoseLevelRepository.fetch()
+                )
+            }
+
+            Page.INSULIN -> {
+                _state.value.copy(
+                    page = selected,
+                    range = null,
+                )
+            }
+
+            Page.FOOD_INTAKES -> {
+                _state.value.copy(
+                    page = selected,
+                    range = null,
+                    foodIntakes = foodIntakeRepository.fetch()
+                )
+            }
+        }
+    }
+
     companion object {
         val Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return StatisticsViewModel(
                     ServiceLocator.glucoseLevelRepository(),
+                    ServiceLocator.foodIntakeRepository(),
                     ServiceLocator.prepareGlucoseLevelReport()
                 ) as T
             }
@@ -269,8 +404,8 @@ private class StatisticsViewModel(
 
 @Preview
 @Composable
-private fun ContextPreview() {
-    val repository = StubGlucoseLevelRepository().apply {
+private fun GlucoseLevelsReportContentPreview() {
+    val glucoseLevelRepository = StubGlucoseLevelRepository().apply {
         List(30) { id ->
             GlucoseLevel(
                 GlucoseLevel.MeasureType.BEFORE_MEAL,
@@ -280,9 +415,39 @@ private fun ContextPreview() {
             ).also { persist(it) }
         }
     }
+    val foodIntakeRepository = StubFoodIntakeRepository()
+
     val model = StatisticsViewModel(
-        repository,
-        PrepareGlucoseLevelsReport.Handler(repository)
+        glucoseLevelRepository,
+        foodIntakeRepository,
+        PrepareGlucoseLevelsReport.Handler(glucoseLevelRepository),
+    )
+
+    Content(model) {}
+}
+
+@Preview
+@Composable
+private fun FoodIntakesReportContentPreview() {
+    val glucoseLevelRepository = StubGlucoseLevelRepository()
+    val foodIntakeRepository = StubFoodIntakeRepository().apply {
+        List(30) { id ->
+            FoodIntake(
+                id,
+                BreadUnit(1),
+                ShortInsulin(1.2F),
+                DateTime()
+            ).also { persist(it) }
+        }
+    }
+
+    val model = StatisticsViewModel(
+        glucoseLevelRepository,
+        foodIntakeRepository,
+        PrepareGlucoseLevelsReport.Handler(glucoseLevelRepository),
+        initial = StatisticsViewModelState(
+            page = Page.FOOD_INTAKES
+        )
     )
 
     Content(model) {}
