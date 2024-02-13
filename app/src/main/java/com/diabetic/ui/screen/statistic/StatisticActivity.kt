@@ -1,15 +1,13 @@
-package com.diabetic.ui.screen
+package com.diabetic.ui.screen.statistic
 
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,26 +17,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Summarize
-import androidx.compose.material3.DateRangePicker
-import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.Divider
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -51,6 +39,7 @@ import com.diabetic.domain.model.GlucoseLevelRepository
 import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
+import com.diabetic.ui.screen.statistic.component.Table
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,6 +47,7 @@ import java.io.OutputStream
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import com.diabetic.ui.screen.statistic.component.DateRangeFilter as ComponentDateRangeFilter
 
 class StatisticActivity : ComponentActivity() {
     private val model: StatisticsViewModel by viewModels(
@@ -109,35 +99,11 @@ private fun Content(model: StatisticsViewModel, saveFile: () -> Unit) {
                     .padding(innerPadding)
                     .fillMaxSize(),
             ) {
-                Row(horizontalArrangement = Arrangement.End) {
-                    DateFilterInput(model::filterGlucoseLevels)
-                }
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.88F)
-                        .padding(horizontal = 7.dp)
-                ) {
-                    GlucoseLevelsTable(state.value.glucoseLevels)
-                }
+                DateRangeFilter(model::filterGlucoseLevels)
+                GlucoseLevelsTable(state.value.glucoseLevels)
                 Divider(modifier = Modifier.padding())
-                Row(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(end = 20.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.End
-                ) {
-                    OutlinedButton(onClick = saveFile) {
-                        Icon(
-                            imageVector = Icons.Default.Summarize,
-                            contentDescription = null
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = "Excel"
-                        )
-                    }
+                ExportButton {
+                    saveFile()
                 }
             }
         }
@@ -155,93 +121,66 @@ private fun TopBar() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DateFilterInput(filter: (Long?, Long?) -> Unit) {
-    val range = IntRange(1900, 2024)
-
-    val state = rememberDateRangePickerState(
-        null,
-        null,
-        null,
-        range,
-        DisplayMode.Input
-    )
-
-    DateRangePicker(
-        state = state,
-        title = null,
-        headline = {
-            Text(
-                modifier = Modifier.padding(start = 20.dp),
-                text = "Фильтрация по дате"
-            )
-        }
-    )
-
-    Log.e(null, state.selectedStartDateMillis.toString())
-    Log.e(null, state.selectedEndDateMillis.toString())
-
-    filter(
-        state.selectedStartDateMillis,
-        state.selectedEndDateMillis
-    )
+private fun DateRangeFilter(filter: (Long?, Long?) -> Unit) {
+    Row(horizontalArrangement = Arrangement.End) {
+        ComponentDateRangeFilter(filter)
+    }
 }
 
 @Composable
 private fun GlucoseLevelsTable(glucoseLevels: List<GlucoseLevel> = listOf()) {
-    Row(
-        Modifier
+    Column(
+        modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 10.dp),
+            .fillMaxHeight(0.88F)
+            .padding(horizontal = 7.dp)
     ) {
-        val text = @Composable { text: String, weight: Float ->
-            Text(
-                text = text,
-                textAlign = TextAlign.Center,
-                fontWeight = FontWeight.Bold,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .weight(weight)
-            )
-        }
-
-        text("№", 0.1F)
-        text("Уровень", 0.2F)
-        text("Дата", 0.35F)
-        text("До\\После еды", 0.25F)
-    }
-    Divider(modifier = Modifier.padding(vertical = 2.dp))
-    LazyColumn {
-        itemsIndexed(glucoseLevels) { index, level ->
-            Row(
-                Modifier
-                    .fillMaxWidth()
-                    .padding(3.dp)
-            ) {
-                val text = @Composable { text: String, weight: Float ->
-                    Text(
-                        text = text,
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier
-                            .weight(weight)
-                    )
-                }
-
-                text((index + 1).toString(), 0.1F)
-                text(level.value.level.toString(), 0.2F)
-                text(level.date.format().readable(), 0.35F)
-                text(
+        Table(
+            headers = listOf(
+                "#", "Уровень", "Дата", "До\\После еды"
+            ),
+            elements = glucoseLevels.mapIndexed() { i, level ->
+                listOf(
+                    (i + 1).toString(),
+                    level.value.level.toString(),
+                    level.date.format().readableDate(),
                     when (level.type) {
                         GlucoseLevel.MeasureType.BEFORE_MEAL -> "До"
                         GlucoseLevel.MeasureType.AFTER_MEAL -> "После"
                         GlucoseLevel.MeasureType.UNSPECIFIED -> "-"
-                    },
-                    0.25F
+                    }
                 )
-            }
-            Divider(modifier = Modifier.padding(vertical = 2.dp))
+            },
+            weights = floatArrayOf(
+                .1F,
+                .2F,
+                .35F,
+                .25F,
+            )
+        )
+    }
+}
+
+@Composable
+private fun ExportButton(saveFile: () -> Unit) {
+    Divider(modifier = Modifier.padding())
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(end = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.End
+    ) {
+        OutlinedButton(onClick = saveFile) {
+            Icon(
+                imageVector = Icons.Default.Summarize,
+                contentDescription = null
+            )
+            Spacer(modifier = Modifier.width(5.dp))
+            Text(
+                text = "Excel"
+            )
         }
     }
 }
@@ -347,24 +286,4 @@ private fun ContextPreview() {
     )
 
     Content(model) {}
-}
-
-@Preview
-@Composable
-private fun GlucoseLevelsTablePreview() {
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .background(Color.White)
-            .padding(3.dp)
-    ) {
-        GlucoseLevelsTable(List(3) { id ->
-            GlucoseLevel(
-                GlucoseLevel.MeasureType.BEFORE_MEAL,
-                GlucoseLevel.Value(1.2F),
-                DateTime(),
-                id
-            )
-        })
-    }
 }
