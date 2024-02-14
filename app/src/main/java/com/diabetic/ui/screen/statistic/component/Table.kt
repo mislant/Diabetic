@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -47,7 +47,7 @@ fun Table(
                     .padding(vertical = 5.dp)
             )
         }
-        itemsIndexed(elements) { index, row ->
+        items(elements) { row ->
             Row {
                 row.forEachIndexed { i, item ->
                     TextCell(
