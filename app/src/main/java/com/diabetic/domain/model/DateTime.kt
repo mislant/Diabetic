@@ -44,6 +44,8 @@ value class DateTime(private val value: LocalDateTime = LocalDateTime.now()) {
     }
 }
 
+val String.dateTime: DateTime get() = DateTime.fromString(this)
+
 fun LocalDateTime.toDateTime(): DateTime = DateTime(this)
 
 fun LocalDateTime.iso(): String = DateTime(this).format().iso()

@@ -5,10 +5,12 @@ import com.diabetic.domain.model.BreadUnit
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.ShortInsulin
+import com.diabetic.domain.model.dateTime
 import com.diabetic.infrastructure.persistent.room.FoodIntakeRoomRepository
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,5 +64,33 @@ class FoodIntakeRoomRepositoryTest : RoomRepositoryTest() {
             assertEquals(insulin.value, prepared.insulin.value)
             assertEquals(date.format().iso(), prepared.date.format().iso())
         }
+    }
+
+    @Test
+    fun `food intakes filtering`() {
+        val repository = FoodIntakeRoomRepository(db.foodIntakeDao()).apply {
+            listOf(
+                "2024-01-01 00:00:00.000",
+                "2024-01-02 01:00:00.000",
+                "2024-01-02 02:00:00.000",
+                "2024-01-03 00:00:00.000",
+            ).forEach {
+                persist(
+                    FoodIntake(
+                        BreadUnit(1),
+                        insulin = ShortInsulin(1.2F),
+                        it.dateTime
+                    )
+                )
+            }
+        }
+
+        val fetched = repository.fetch(
+            "2024-01-02 00:00:00.000".dateTime.localDataTime(),
+            "2024-01-02 23:59:59.000".dateTime.localDataTime()
+        )
+
+        assertTrue(fetched.isNotEmpty())
+        assertEquals(2, fetched.count())
     }
 }

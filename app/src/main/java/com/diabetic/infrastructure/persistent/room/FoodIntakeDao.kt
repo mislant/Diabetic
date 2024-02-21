@@ -14,4 +14,7 @@ interface FoodIntakeDao {
 
     @Query("SELECT * FROM food_intake")
     fun fetch(): List<FoodIntakeEntity>
+
+    @Query("SELECT * FROM food_intake WHERE date BETWEEN :from AND :to")
+    fun fetch(from: String, to: String): List<FoodIntakeEntity>
 }

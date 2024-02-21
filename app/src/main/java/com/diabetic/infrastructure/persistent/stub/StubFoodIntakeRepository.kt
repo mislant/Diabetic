@@ -2,6 +2,7 @@ package com.diabetic.infrastructure.persistent.stub
 
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.FoodIntakeRepository
+import java.time.LocalDateTime
 
 class StubFoodIntakeRepository : InMemoryStorage<FoodIntake>(), FoodIntakeRepository {
     override fun persist(foodIntake: FoodIntake): FoodIntake {
@@ -18,5 +19,12 @@ class StubFoodIntakeRepository : InMemoryStorage<FoodIntake>(), FoodIntakeReposi
 
     override fun fetch(): List<FoodIntake> {
         return storage.toList()
+    }
+
+    override fun fetch(from: LocalDateTime, to: LocalDateTime): List<FoodIntake> {
+        return storage.filter {
+            it.date.localDataTime() > from &&
+                    it.date.localDataTime() < to
+        }
     }
 }
