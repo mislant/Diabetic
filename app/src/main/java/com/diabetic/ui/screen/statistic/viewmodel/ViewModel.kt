@@ -71,8 +71,15 @@ class ViewModel(
             .fetch(filter) as List<Nothing>
     }
 
-    fun saveReport(stream: OutputStream) {
+    fun generateReportName(): String {
+        return strategy.generateReportName(value.filter)
+    }
 
+    fun generateReport(stream: OutputStream) {
+        strategy.generateReport(
+            value.filter,
+            stream
+        )
     }
 
     companion object {
@@ -81,7 +88,10 @@ class ViewModel(
             override fun <T : AndroidViewModel> create(modelClass: Class<T>): T {
                 return ViewModel(
                     Strategies(
-                        GlucoseReport(ServiceLocator.glucoseLevelRepository()),
+                        GlucoseReport(
+                            ServiceLocator.glucoseLevelRepository(),
+                            ServiceLocator.prepareGlucoseLevelReport()
+                        ),
                         FoodIntakeReport(ServiceLocator.foodIntakeRepository()),
                     )
                 ) as T

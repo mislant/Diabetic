@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
@@ -33,7 +34,7 @@ class StatisticActivity : ComponentActivity() {
     }
     val exportReport = registerForActivityResult(CreateReport()) {
         CreateReport.handle(it, this) { stream ->
-            model.saveReport(stream)
+            model.generateReport(stream)
         }
     }
 
@@ -41,14 +42,19 @@ class StatisticActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            Content(model = model)
+            Content(model = model) {
+                exportReport.launch(
+                    model.generateReportName()
+                )
+            }
         }
     }
 }
 
 @Composable
 private fun Content(
-    model: InternalViewModel
+    model: InternalViewModel,
+    exportReport: () -> Unit
 ) {
     val state = model.state
         .collectAsState()
@@ -73,9 +79,7 @@ private fun Content(
                     filter = model::filter
                 )
                 ReportTable(state)
-                ExportButton {
-
-                }
+                ExportButton(exportReport)
             }
         }
     }
@@ -97,9 +101,14 @@ private fun ContentPreview() {
     Content(
         model = InternalViewModel(
             Strategies(
-                GlucoseReport(repository),
+                GlucoseReport(
+                    repository,
+                    PrepareGlucoseLevelsReport.Handler(repository)
+                ),
                 FoodIntakeReport(StubFoodIntakeRepository())
             )
         )
-    )
+    ) {
+
+    }
 }

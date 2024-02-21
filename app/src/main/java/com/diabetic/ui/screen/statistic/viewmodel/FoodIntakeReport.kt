@@ -2,6 +2,7 @@ package com.diabetic.ui.screen.statistic.viewmodel
 
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.FoodIntakeRepository
+import java.io.OutputStream
 
 class FoodIntakeReport(
     private val repository: FoodIntakeRepository
@@ -15,5 +16,13 @@ class FoodIntakeReport(
 
     private fun fetch(): List<FoodIntake> {
         return repository.fetch()
+    }
+
+    override fun generateReportName(filter: LongRange?): String {
+        TODO("Not yet implemented")
+    }
+
+    override fun generateReport(filter: LongRange?, stream: OutputStream) {
+        TODO("Not yet implemented")
     }
 }
