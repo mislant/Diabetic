@@ -1,0 +1,20 @@
+package com.diabetic.ui.screen.statistic.viewmodel
+
+import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.GlucoseLevelRepository
+
+class GlucoseReport(
+    private val repository: GlucoseLevelRepository
+) : ReportStrategy<GlucoseLevel>() {
+
+    override fun fetch(filter: LongRange?): List<GlucoseLevel> {
+        return if (filter == null) fetch() else repository.fetch(
+            filter.from.asFromLocalDateTime(),
+            filter.to.asToLocalDateTime()
+        )
+    }
+
+    private fun fetch(): List<GlucoseLevel> {
+        return repository.fetch()
+    }
+}
