@@ -1,5 +1,6 @@
 package com.diabetic.domain.service
 
+import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.readable
 import org.apache.poi.ss.usermodel.BorderStyle
@@ -19,12 +20,21 @@ fun OutputStream.generateGlucoseReport(
     glucoseLevels: List<GlucoseLevel>,
     meta: ReportMeta
 ): OutputStream {
-    val report = GlucoseReport().excel(glucoseLevels, meta)
+    val report = GlucoseReport.excel(glucoseLevels, meta)
     report.write(this)
     return this
 }
 
-abstract class Report<T> {
+fun OutputStream.generateFoodIntakeReport(
+    foodIntakes: List<FoodIntake>,
+    meta: ReportMeta
+): OutputStream {
+    val report = FoodIntakeReport.excel(foodIntakes, meta)
+    report.write(this)
+    return this
+}
+
+sealed class Report<T> {
     abstract val headerNames: List<String>
 
     fun excel(data: List<T>, meta: ReportMeta): Workbook {
@@ -34,6 +44,7 @@ abstract class Report<T> {
         title(sheet, workbook, meta)
         header(sheet, workbook)
         content(sheet, workbook, data)
+        customization(sheet, workbook)
 
         return workbook
     }
@@ -118,9 +129,11 @@ abstract class Report<T> {
     }
 
     protected abstract fun Row.writeLine(data: T, style: CellStyle)
+
+    protected open fun customization(sheet: Sheet, workbook: Workbook) {}
 }
 
-class GlucoseReport : Report<GlucoseLevel>() {
+data object GlucoseReport : Report<GlucoseLevel>() {
     override val headerNames: List<String>
         get() = listOf(
             " # ", "Уровень глюкозы", "Дата и время", "До\\После еды"
@@ -149,6 +162,37 @@ class GlucoseReport : Report<GlucoseLevel>() {
                 }
             )
         }
+    }
+}
+
+data object FoodIntakeReport : Report<FoodIntake>() {
+    override val headerNames: List<String>
+        get() = listOf(
+            " # ", "Инсулин", "Хлебные единицы", "Дата и время"
+        )
+
+    override fun Row.writeLine(data: FoodIntake, style: CellStyle) {
+        createCell(0).also {
+            it.cellStyle = style
+            it.setCellValue(data.id!!.toString())
+        }
+        createCell(1).also {
+            it.cellStyle = style
+            it.setCellValue("%.2f".format(data.insulin.value))
+        }
+        createCell(2).also {
+            it.cellStyle = style
+            it.setCellValue(data.breadUnit.value.toString())
+        }
+        createCell(3).also {
+            it.cellStyle = style
+            it.setCellValue(data.date.format().readable())
+        }
+    }
+
+    override fun customization(sheet: Sheet, workbook: Workbook) {
+        val characterWidth = 2F
+        sheet.setColumnWidth(3, (20 * characterWidth * 256).toInt())
     }
 }
 
