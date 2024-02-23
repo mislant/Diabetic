@@ -12,6 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.diabetic.application.command.PrepareFoodIntakeReport
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
@@ -32,7 +33,7 @@ class StatisticActivity : ComponentActivity() {
     private val model: InternalViewModel by viewModels {
         InternalViewModel.Factory
     }
-    val exportReport = registerForActivityResult(CreateReport()) {
+    private val exportReport = registerForActivityResult(CreateReport()) {
         CreateReport.handle(it, this) { stream ->
             model.generateReport(stream)
         }
@@ -105,7 +106,10 @@ private fun ContentPreview() {
                     repository,
                     PrepareGlucoseLevelsReport.Handler(repository)
                 ),
-                FoodIntakeReport(StubFoodIntakeRepository())
+                FoodIntakeReport(
+                    StubFoodIntakeRepository(),
+                    PrepareFoodIntakeReport.Handler(StubFoodIntakeRepository())
+                )
             )
         )
     ) {

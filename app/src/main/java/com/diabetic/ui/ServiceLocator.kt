@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.diabetic.application.command.AddCarbohydrate
 import com.diabetic.application.command.AddGlucoseLevel
 import com.diabetic.application.command.BeginFoodIntake
+import com.diabetic.application.command.PrepareFoodIntakeReport
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.CarbohydrateStorage
 import com.diabetic.domain.model.FoodIntakeRepository
@@ -72,6 +73,12 @@ object ServiceLocator {
     fun carbohydrateStorage(): CarbohydrateStorage {
         return CarbohydrateDataStoreStorage(
             get(AppDatabase::class).keyValueDao()
+        )
+    }
+
+    fun prepareFoodIntakeReport(): PrepareFoodIntakeReport.Handler {
+        return PrepareFoodIntakeReport.Handler(
+            foodIntakeRepository()
         )
     }
 

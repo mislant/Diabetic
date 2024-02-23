@@ -10,12 +10,12 @@ import java.io.File
 import java.time.LocalDateTime
 import java.time.Month
 
-class PrepareGlucoseReportTest {
+class PrepareGlucoseLevelsReportTest {
 
     @Test
     fun `generate file report name for all time`() {
         val handler = PrepareGlucoseLevelsReport.Handler(StubGlucoseLevelRepository())
-        val command = PrepareGlucoseLevelsReport.GenerateFileNameCommand(null)
+        val command = PrepareReport.GenerateFileNameCommand(null)
 
         val name = handler.handle(command)
 
@@ -25,7 +25,7 @@ class PrepareGlucoseReportTest {
     @Test
     fun `generate file report name based on dates range`() {
         val handler = PrepareGlucoseLevelsReport.Handler(StubGlucoseLevelRepository())
-        val command = PrepareGlucoseLevelsReport.GenerateFileNameCommand(
+        val command = PrepareReport.GenerateFileNameCommand(
             Pair(
                 LocalDateTime.of(2024, Month.JANUARY, 1, 0, 0),
                 LocalDateTime.of(2024, Month.JANUARY, 2, 0, 0),
@@ -57,7 +57,7 @@ class PrepareGlucoseReportTest {
             }
         }
         val handler = PrepareGlucoseLevelsReport.Handler(repository)
-        val command = PrepareGlucoseLevelsReport.WriteReportCommand(
+        val command = PrepareReport.WriteReportCommand(
             null,
             File("src/test/res/runtime/test.xlsx").outputStream()
         )
@@ -87,7 +87,7 @@ class PrepareGlucoseReportTest {
             }
         }
         val handler = PrepareGlucoseLevelsReport.Handler(repository)
-        val command = PrepareGlucoseLevelsReport.WriteReportCommand(
+        val command = PrepareReport.WriteReportCommand(
             Pair(
                 LocalDateTime.of(2024, Month.JANUARY, 1,0,0),
                 LocalDateTime.of(2024, Month.JANUARY, 3,0,0),

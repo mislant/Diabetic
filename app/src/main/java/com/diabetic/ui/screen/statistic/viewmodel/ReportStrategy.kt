@@ -1,5 +1,6 @@
 package com.diabetic.ui.screen.statistic.viewmodel
 
+import com.diabetic.application.command.PrepareReport
 import java.io.OutputStream
 import java.time.Instant
 import java.time.LocalDateTime
@@ -24,7 +25,28 @@ sealed class ReportStrategy<T> {
         TimeZone.getDefault().toZoneId()
     )
 
-    abstract fun generateReportName(filter: LongRange?): String
+    protected abstract val handler: PrepareReport.Handler
 
-    abstract fun generateReport(filter: LongRange?, stream: OutputStream)
+    fun generateReportName(filter: LongRange?): String{
+        return handler.handle(
+            PrepareReport.GenerateFileNameCommand(
+                if (filter == null) null else Pair(
+                    filter.from.asFromLocalDateTime(),
+                    filter.to.asToLocalDateTime()
+                )
+            )
+        )
+    }
+
+    fun generateReport(filter: LongRange?, stream: OutputStream) {
+        return handler.handle(
+            PrepareReport.WriteReportCommand(
+                if (filter == null) null else Pair(
+                    filter.from.asFromLocalDateTime(),
+                    filter.to.asToLocalDateTime()
+                ),
+                stream
+            )
+        )
+    }
 }
