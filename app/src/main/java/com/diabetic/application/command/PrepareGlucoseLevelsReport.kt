@@ -3,7 +3,7 @@ package com.diabetic.application.command
 import com.diabetic.domain.model.GlucoseLevelRepository
 import com.diabetic.domain.model.readableDate
 import com.diabetic.domain.service.ReportMeta
-import com.diabetic.domain.service.excel
+import com.diabetic.domain.service.generateGlucoseReport
 import java.io.OutputStream
 import java.time.LocalDateTime
 
@@ -46,11 +46,12 @@ class PrepareGlucoseLevelsReport {
             val meta = ReportMeta(
                 range = if (command.range == null) null else ReportMeta.Range(
                     command.range
-                )
+                ),
+                "Отчет по глюкозе"
             )
 
             return command.stream
-                .excel(levels, meta)
+                .generateGlucoseReport(levels, meta)
                 .close()
         }
 

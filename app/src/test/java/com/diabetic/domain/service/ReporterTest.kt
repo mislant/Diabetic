@@ -17,7 +17,8 @@ class ReporterTest {
                         LocalDateTime.now(),
                         LocalDateTime.now()
                     )
-                )
+                ),
+                "Отчет по глюкозе"
             )
         val levels = MutableList(3) { id ->
             GlucoseLevel(
@@ -31,7 +32,7 @@ class ReporterTest {
 
         report
             .outputStream()
-            .excel(levels, meta)
+            .generateGlucoseReport(levels, meta)
             .close()
 
         assertTrue(true)

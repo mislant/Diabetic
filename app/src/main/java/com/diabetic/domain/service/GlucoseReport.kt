@@ -6,6 +6,7 @@ import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.FillPatternType
 import org.apache.poi.ss.usermodel.HorizontalAlignment
+import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.ss.util.CellRangeAddress
@@ -14,24 +15,25 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.OutputStream
 import java.time.LocalDateTime
 
-fun OutputStream.excel(glucoseLevels: List<GlucoseLevel>, meta: ReportMeta): OutputStream {
-    val report = Reporter().excel(glucoseLevels, meta)
+fun OutputStream.generateGlucoseReport(
+    glucoseLevels: List<GlucoseLevel>,
+    meta: ReportMeta
+): OutputStream {
+    val report = GlucoseReport().excel(glucoseLevels, meta)
     report.write(this)
     return this
 }
 
-class Reporter {
-    private val headerNames = listOf(
-        " # ", "Уровень глюкозы", "Дата и время", "До\\После еды"
-    )
+abstract class Report<T> {
+    abstract val headerNames: List<String>
 
-    fun excel(glucoseLevels: List<GlucoseLevel>, meta: ReportMeta): Workbook {
+    fun excel(data: List<T>, meta: ReportMeta): Workbook {
         val workbook = XSSFWorkbook()
-        val sheet = workbook.createSheet("Показатели глюкозы")
+        val sheet = workbook.createSheet(meta.sheetName)
 
         title(sheet, workbook, meta)
         header(sheet, workbook)
-        content(sheet, workbook, glucoseLevels)
+        content(sheet, workbook, data)
 
         return workbook
     }
@@ -50,14 +52,18 @@ class Reporter {
         }
 
         val title = sheet.let {
-            val cell = it.createRow(0)
-                .createCell(0)
-            it.addMergedRegion(CellRangeAddress(0, 0, 0, 3))
+            val cell = it.createRow(0).createCell(0)
+            it.addMergedRegion(
+                CellRangeAddress(
+                    0, 0,
+                    0, headerNames.count() - 1
+                )
+            )
             cell
         }
         title.cellStyle = style
         title.setCellValue(
-            "Показатели глюкозы %s ".format(
+            "${meta.sheetName} %s ".format(
                 if (meta.range == null) {
                     "за все время"
                 } else {
@@ -93,7 +99,7 @@ class Reporter {
         }
     }
 
-    private fun content(sheet: Sheet, workbook: Workbook, glucoseLevels: List<GlucoseLevel>) {
+    fun content(sheet: Sheet, workbook: Workbook, data: List<T>) {
         val style = workbook.createCellStyle().also {
             it.setFont(workbook.createFont().also {
                 it.fontName = "Arial"
@@ -104,37 +110,51 @@ class Reporter {
         }
 
         val offset = 2
-        glucoseLevels.forEachIndexed { index, glucoseLevel ->
-            val line = sheet.createRow(index + offset)
+        data.forEachIndexed { index, item ->
+            sheet
+                .createRow(index + offset)
+                .writeLine(item, style)
+        }
+    }
 
-            line.createCell(0).also {
-                it.cellStyle = style
-                it.setCellValue(glucoseLevel.id!!.toString())
-            }
-            line.createCell(1).also {
-                it.cellStyle = style
-                it.setCellValue("%.2f".format(glucoseLevel.value.level))
-            }
-            line.createCell(2).also {
-                it.cellStyle = style
-                it.setCellValue(glucoseLevel.date.format().readable())
-            }
-            line.createCell(3).also {
-                it.cellStyle = style
-                it.setCellValue(
-                    when (glucoseLevel.type) {
-                        GlucoseLevel.MeasureType.BEFORE_MEAL -> "До"
-                        GlucoseLevel.MeasureType.AFTER_MEAL -> "После"
-                        GlucoseLevel.MeasureType.UNSPECIFIED -> "-"
-                    }
-                )
-            }
+    protected abstract fun Row.writeLine(data: T, style: CellStyle)
+}
+
+class GlucoseReport : Report<GlucoseLevel>() {
+    override val headerNames: List<String>
+        get() = listOf(
+            " # ", "Уровень глюкозы", "Дата и время", "До\\После еды"
+        )
+
+    override fun Row.writeLine(data: GlucoseLevel, style: CellStyle) {
+        createCell(0).also {
+            it.cellStyle = style
+            it.setCellValue(data.id!!.toString())
+        }
+        createCell(1).also {
+            it.cellStyle = style
+            it.setCellValue("%.2f".format(data.value.level))
+        }
+        createCell(2).also {
+            it.cellStyle = style
+            it.setCellValue(data.date.format().readable())
+        }
+        createCell(3).also {
+            it.cellStyle = style
+            it.setCellValue(
+                when (data.type) {
+                    GlucoseLevel.MeasureType.BEFORE_MEAL -> "До"
+                    GlucoseLevel.MeasureType.AFTER_MEAL -> "После"
+                    GlucoseLevel.MeasureType.UNSPECIFIED -> "-"
+                }
+            )
         }
     }
 }
 
 data class ReportMeta(
-    val range: Range?
+    val range: Range?,
+    val sheetName: String
 ) {
     @JvmInline
     value class Range(private val range: Pair<LocalDateTime, LocalDateTime>) {
