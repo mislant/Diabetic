@@ -58,6 +58,11 @@ private fun Content() {
                     test = "Добавить уровень глюкозы",
                     activity = AddGlucoseActivity::class
                 )
+                Spacer(modifier = Modifier.size(20.dp))
+                MainActionButton(
+                    test = "Добавить длинный инсулин",
+                    activity = AddLongInsulinActivity::class
+                )
             }
         }
     }

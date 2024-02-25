@@ -4,16 +4,19 @@ import android.content.Context
 import androidx.room.Room
 import com.diabetic.application.command.AddCarbohydrate
 import com.diabetic.application.command.AddGlucoseLevel
+import com.diabetic.application.command.AddLongInsulin
 import com.diabetic.application.command.BeginFoodIntake
 import com.diabetic.application.command.PrepareFoodIntakeReport
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.domain.model.CarbohydrateStorage
 import com.diabetic.domain.model.FoodIntakeRepository
 import com.diabetic.domain.model.GlucoseLevelRepository
+import com.diabetic.domain.model.LongInsulinRepository
 import com.diabetic.infrastructure.persistent.room.AppDatabase
 import com.diabetic.infrastructure.persistent.room.CarbohydrateDataStoreStorage
 import com.diabetic.infrastructure.persistent.room.FoodIntakeRoomRepository
 import com.diabetic.infrastructure.persistent.room.GlucoseLevelRoomRepository
+import com.diabetic.infrastructure.persistent.room.LongInsulinRoomRepository
 import kotlin.reflect.KClass
 
 object ServiceLocator {
@@ -79,6 +82,18 @@ object ServiceLocator {
     fun prepareFoodIntakeReport(): PrepareFoodIntakeReport.Handler {
         return PrepareFoodIntakeReport.Handler(
             foodIntakeRepository()
+        )
+    }
+
+    fun addLongInsulin(): AddLongInsulin.Handler {
+        return AddLongInsulin.Handler(
+            longInsulinRepository()
+        )
+    }
+
+    fun longInsulinRepository(): LongInsulinRepository {
+        return LongInsulinRoomRepository(
+            get(AppDatabase::class).longInsulinDao()
         )
     }
 

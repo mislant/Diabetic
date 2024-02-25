@@ -7,11 +7,13 @@ import androidx.room.RoomDatabase
     entities = [
         GlucoseLevelEntity::class,
         FoodIntakeEntity::class,
-        KeyValueEntity::class
+        KeyValueEntity::class,
+        LongInsulinEntity::class
     ], version = 1, exportSchema = false
 )
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun glucoseLevelDao(): GlucoseLevelDAO
+    abstract fun glucoseLevelDao(): GlucoseLevelDao
     abstract fun foodIntakeDao(): FoodIntakeDao
     abstract fun keyValueDao(): KeyValueDao
+    abstract fun longInsulinDao(): LongInsulinDao
 }
