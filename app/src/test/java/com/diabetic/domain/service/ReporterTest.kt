@@ -4,6 +4,7 @@ import com.diabetic.domain.model.BreadUnit
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.LongInsulin
 import com.diabetic.domain.model.ShortInsulin
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -31,7 +32,7 @@ class ReporterTest {
                 date = DateTime()
             )
         }
-        val report = File("src/test/res/runtime/test_report.xlsx")
+        val report = File("src/test/res/runtime/glucose_test_report.xlsx")
 
         report
             .outputStream()
@@ -60,11 +61,37 @@ class ReporterTest {
                 DateTime()
             )
         }
-        val report = File("src/test/res/runtime/test_report.xlsx")
+        val report = File("src/test/res/runtime/food_intake_test_report.xlsx")
 
         report
             .outputStream()
             .generateFoodIntakeReport(foodIntakes, meta)
+            .close()
+    }
+
+    @Test
+    fun `creating long insulin excel report`() {
+        val meta = ReportMeta(
+            ReportMeta.Range(
+                Pair(
+                    LocalDateTime.now(),
+                    LocalDateTime.now()
+                )
+            ),
+            "Отчет по длинному инсулину"
+        )
+        val longInsulin = List(3) { id ->
+            LongInsulin(
+                id = id,
+                value = 1.2F,
+                datetime = DateTime()
+            )
+        }
+        val report = File("src/test/res/runtime/insulin_test_report.xlsx")
+
+        report
+            .outputStream()
+            .generateLongInsulinReport(longInsulin, meta)
             .close()
     }
 }

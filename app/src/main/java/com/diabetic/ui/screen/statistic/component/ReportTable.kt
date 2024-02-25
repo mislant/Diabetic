@@ -10,12 +10,17 @@ import androidx.compose.ui.unit.dp
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.ui.screen.statistic.viewmodel.ReportState
+import com.diabetic.ui.screen.statistic.viewmodel.ReportState.FoodIntakes
+import com.diabetic.ui.screen.statistic.viewmodel.ReportState.GlucoseLevels
+import com.diabetic.ui.screen.statistic.viewmodel.ReportState.LongInsulin
+import com.diabetic.domain.model.LongInsulin as DomainLongInsulin
 
 @Composable
 fun ReportTable(state: ReportState<out Any>) {
     when (state) {
-        is ReportState.GlucoseLevels -> GlucoseLevelsTable(state.data)
-        is ReportState.FoodIntakes -> FoodIntakeTable(state.data)
+        is GlucoseLevels -> GlucoseLevelsTable(state.data)
+        is FoodIntakes -> FoodIntakeTable(state.data)
+        is LongInsulin -> LongInsulinTable(state.data)
     }
 }
 
@@ -77,6 +82,34 @@ private fun FoodIntakeTable(foodIntakes: List<FoodIntake>) {
                 .1F,
                 .25F,
                 .25F,
+                .35F,
+            )
+        )
+    }
+}
+
+@Composable
+private fun LongInsulinTable(longInsulin: List<DomainLongInsulin>) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.88F)
+            .padding(horizontal = 7.dp)
+    ) {
+        Table(
+            headers = listOf(
+                "#", "Инсулин", "Дата"
+            ),
+            elements = longInsulin.mapIndexed() { i, longInsulin ->
+                listOf(
+                    (i + 1).toString(),
+                    longInsulin.value.toString(),
+                    longInsulin.datetime.format().readableDate()
+                )
+            },
+            weights = floatArrayOf(
+                .1F,
+                .35F,
                 .35F,
             )
         )

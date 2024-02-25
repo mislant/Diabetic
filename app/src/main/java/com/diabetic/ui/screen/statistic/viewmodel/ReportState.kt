@@ -2,6 +2,7 @@ package com.diabetic.ui.screen.statistic.viewmodel
 
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.LongInsulin as DomainLongInsulin
 
 sealed class ReportState<T>(
     val of: Report,
@@ -9,11 +10,14 @@ sealed class ReportState<T>(
     val filter: LongRange? = null,
 ) {
     enum class Report(val title: String) {
-        GLUCOSE("По глюкозе") {
+        GLUCOSE("Глюкоза") {
             override fun state(): ReportState<GlucoseLevel> = GlucoseLevels()
         },
-        FOOD_INTAKE("По приемам пищи") {
+        FOOD_INTAKE("Приемы пищи") {
             override fun state(): ReportState<FoodIntake> = FoodIntakes()
+        },
+        LONG_INSULIN("Длинный инсулин") {
+            override fun state(): ReportState<out Any> = LongInsulin()
         };
 
         abstract fun state(): ReportState<out Any>
@@ -39,5 +43,16 @@ sealed class ReportState<T>(
     ) : ReportState<FoodIntake>(Report.FOOD_INTAKE, data, filter) {
         override fun copy(data: List<FoodIntake>, filter: LongRange?): ReportState<FoodIntake> =
             FoodIntakes(data, filter)
+    }
+
+    class LongInsulin(
+        data: List<DomainLongInsulin> = listOf(),
+        filter: LongRange? = null
+    ) : ReportState<DomainLongInsulin>(Report.LONG_INSULIN, data, filter) {
+        override fun copy(
+            data: List<DomainLongInsulin>,
+            filter: LongRange?
+        ): ReportState<DomainLongInsulin> =
+            LongInsulin(data, filter)
     }
 }

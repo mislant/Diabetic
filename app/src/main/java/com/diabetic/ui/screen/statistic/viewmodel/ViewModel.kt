@@ -96,6 +96,10 @@ class ViewModel(
                             ServiceLocator.foodIntakeRepository(),
                             ServiceLocator.prepareFoodIntakeReport()
                         ),
+                        LongInsulinReport(
+                            ServiceLocator.longInsulinRepository(),
+                            ServiceLocator.prepareLongInsulinReport()
+                        )
                     )
                 ) as T
             }

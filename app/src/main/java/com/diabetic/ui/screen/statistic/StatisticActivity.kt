@@ -14,10 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.diabetic.application.command.PrepareFoodIntakeReport
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
+import com.diabetic.application.command.PrepareLongInsulinReport
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.LongInsulin
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import com.diabetic.infrastructure.persistent.stub.StubGlucoseLevelRepository
+import com.diabetic.infrastructure.persistent.stub.StubLongInsulinRepository
 import com.diabetic.ui.screen.component.DiabeticLayout
 import com.diabetic.ui.screen.statistic.component.DateRangeFilter
 import com.diabetic.ui.screen.statistic.component.ExportButton
@@ -25,6 +28,8 @@ import com.diabetic.ui.screen.statistic.component.ReportTable
 import com.diabetic.ui.screen.statistic.component.TopBar
 import com.diabetic.ui.screen.statistic.viewmodel.FoodIntakeReport
 import com.diabetic.ui.screen.statistic.viewmodel.GlucoseReport
+import com.diabetic.ui.screen.statistic.viewmodel.LongInsulinReport
+import com.diabetic.ui.screen.statistic.viewmodel.ReportState
 import com.diabetic.ui.screen.statistic.viewmodel.Strategies
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import com.diabetic.ui.screen.statistic.viewmodel.ViewModel as InternalViewModel
@@ -88,7 +93,7 @@ private fun Content(
 
 @Preview
 @Composable
-private fun ContentPreview() {
+private fun GlucoseReportContentPreview() {
     val repository = StubGlucoseLevelRepository().apply {
         List(30) { id ->
             GlucoseLevel(
@@ -109,8 +114,47 @@ private fun ContentPreview() {
                 FoodIntakeReport(
                     StubFoodIntakeRepository(),
                     PrepareFoodIntakeReport.Handler(StubFoodIntakeRepository())
+                ),
+                LongInsulinReport(
+                    StubLongInsulinRepository(),
+                    PrepareLongInsulinReport.Handler(StubLongInsulinRepository())
                 )
             )
+        )
+    ) {
+
+    }
+}
+
+@Preview
+@Composable
+private fun LongInsulinReportContentPreview() {
+    val repository = StubLongInsulinRepository().apply {
+        List(30) { id ->
+            LongInsulin(
+                id = id,
+                datetime = DateTime(),
+                value = 1.2F
+            ).also { persist(it) }
+        }
+    }
+    Content(
+        model = InternalViewModel(
+            Strategies(
+                GlucoseReport(
+                    StubGlucoseLevelRepository(),
+                    PrepareGlucoseLevelsReport.Handler(StubGlucoseLevelRepository())
+                ),
+                FoodIntakeReport(
+                    StubFoodIntakeRepository(),
+                    PrepareFoodIntakeReport.Handler(StubFoodIntakeRepository())
+                ),
+                LongInsulinReport(
+                    repository,
+                    PrepareLongInsulinReport.Handler(repository)
+                )
+            ),
+            initial = ReportState.Report.LONG_INSULIN.state()
         )
     ) {
 

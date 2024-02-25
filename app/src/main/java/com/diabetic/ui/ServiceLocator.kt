@@ -8,6 +8,7 @@ import com.diabetic.application.command.AddLongInsulin
 import com.diabetic.application.command.BeginFoodIntake
 import com.diabetic.application.command.PrepareFoodIntakeReport
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
+import com.diabetic.application.command.PrepareLongInsulinReport
 import com.diabetic.domain.model.CarbohydrateStorage
 import com.diabetic.domain.model.FoodIntakeRepository
 import com.diabetic.domain.model.GlucoseLevelRepository
@@ -87,6 +88,12 @@ object ServiceLocator {
 
     fun addLongInsulin(): AddLongInsulin.Handler {
         return AddLongInsulin.Handler(
+            longInsulinRepository()
+        )
+    }
+
+    fun prepareLongInsulinReport(): PrepareLongInsulinReport.Handler {
+        return PrepareLongInsulinReport.Handler(
             longInsulinRepository()
         )
     }

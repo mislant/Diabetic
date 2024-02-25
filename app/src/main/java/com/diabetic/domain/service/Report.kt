@@ -2,6 +2,7 @@ package com.diabetic.domain.service
 
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.LongInsulin
 import com.diabetic.domain.model.readable
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.CellStyle
@@ -34,7 +35,30 @@ fun OutputStream.generateFoodIntakeReport(
     return this
 }
 
-sealed class Report<T> {
+fun OutputStream.generateLongInsulinReport(
+    longInsulin: List<LongInsulin>,
+    meta: ReportMeta
+): OutputStream {
+    val report = LongInsulinReport.excel(longInsulin, meta)
+    report.write(this)
+    return this
+}
+
+data class ReportMeta(
+    val range: Range?,
+    val sheetName: String
+) {
+    @JvmInline
+    value class Range(private val range: Pair<LocalDateTime, LocalDateTime>) {
+        val from
+            get() = range.first
+
+        val to
+            get() = range.second
+    }
+}
+
+private sealed class Report<T> {
     abstract val headerNames: List<String>
 
     fun excel(data: List<T>, meta: ReportMeta): Workbook {
@@ -133,7 +157,14 @@ sealed class Report<T> {
     protected open fun customization(sheet: Sheet, workbook: Workbook) {}
 }
 
-data object GlucoseReport : Report<GlucoseLevel>() {
+private fun CellStyle.setBorder(style: BorderStyle) {
+    this.borderTop = style
+    this.borderBottom = style
+    this.borderLeft = style
+    this.borderRight = style
+}
+
+private data object GlucoseReport : Report<GlucoseLevel>() {
     override val headerNames: List<String>
         get() = listOf(
             " # ", "Уровень глюкозы", "Дата и время", "До\\После еды"
@@ -165,7 +196,7 @@ data object GlucoseReport : Report<GlucoseLevel>() {
     }
 }
 
-data object FoodIntakeReport : Report<FoodIntake>() {
+private data object FoodIntakeReport : Report<FoodIntake>() {
     override val headerNames: List<String>
         get() = listOf(
             " # ", "Инсулин", "Хлебные единицы", "Дата и время"
@@ -196,23 +227,29 @@ data object FoodIntakeReport : Report<FoodIntake>() {
     }
 }
 
-data class ReportMeta(
-    val range: Range?,
-    val sheetName: String
-) {
-    @JvmInline
-    value class Range(private val range: Pair<LocalDateTime, LocalDateTime>) {
-        val from
-            get() = range.first
+private data object LongInsulinReport : Report<LongInsulin>() {
+    override val headerNames: List<String> = listOf(
+        " # ", "Длинный инсулин", "Дата и время"
+    )
 
-        val to
-            get() = range.second
+    override fun Row.writeLine(data: LongInsulin, style: CellStyle) {
+        createCell(0).also {
+            it.cellStyle = style
+            it.setCellValue(data.id!!.toString())
+        }
+        createCell(1).also {
+            it.cellStyle = style
+            it.setCellValue("%.2f".format(data.value))
+        }
+        createCell(2).also {
+            it.cellStyle = style
+            it.setCellValue(data.datetime.format().readable())
+        }
     }
-}
 
-private fun CellStyle.setBorder(style: BorderStyle) {
-    this.borderTop = style
-    this.borderBottom = style
-    this.borderLeft = style
-    this.borderRight = style
+    override fun customization(sheet: Sheet, workbook: Workbook) {
+        val characterWidth = 2F
+        sheet.setColumnWidth(1, (20 * characterWidth * 256).toInt())
+        sheet.setColumnWidth(2, (25 * characterWidth * 256).toInt())
+    }
 }
