@@ -30,6 +30,12 @@ class FoodIntakeRoomRepository(private val dao: FoodIntakeDao) : FoodIntakeRepos
         }
     }
 
+    override fun delete(id: Int) {
+        dao.fetch(id)?.also {
+            dao.delete(it)
+        }
+    }
+
     private fun FoodIntake.entity(): FoodIntakeEntity = FoodIntakeEntity(
         breadUnit = breadUnit.value,
         insulin = insulin.value,

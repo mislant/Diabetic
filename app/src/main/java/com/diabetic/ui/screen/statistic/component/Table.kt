@@ -1,12 +1,16 @@
 package com.diabetic.ui.screen.statistic.component
 
+import androidx.collection.FloatList
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -26,14 +30,23 @@ fun Table(
     headers: List<String>,
     elements: List<List<String>>,
     modifier: Modifier = Modifier,
-    weights: FloatArray = FloatArray(headers.count()) { .1F }
+    actions: (@Composable (row: Int) -> Unit)? = null,
+    weights: List<Float> = List(headers.count()) { .1F }
 ) {
+    val preparedHeaders =
+        if (actions != null) headers.toMutableList().apply {
+            add("")
+            toList()
+        }
+        else headers
+
+
     LazyColumn(
         modifier = modifier.fillMaxSize()
     ) {
         item {
             Row {
-                headers.forEachIndexed { i, header ->
+                preparedHeaders.forEachIndexed { i, header ->
                     TextCell(
                         text = header,
                         weight = weights[i],
@@ -47,7 +60,7 @@ fun Table(
                     .padding(vertical = 5.dp)
             )
         }
-        items(elements) { row ->
+        itemsIndexed(elements) { rowNum, row ->
             Row {
                 row.forEachIndexed { i, item ->
                     TextCell(
@@ -55,6 +68,12 @@ fun Table(
                         weight = weights[i],
                         style = MaterialTheme.typography.bodyMedium
                     )
+                }
+
+                if (actions != null) {
+                    BoxCell(weight = weights.last()) {
+                        actions(rowNum)
+                    }
                 }
             }
             Divider(
@@ -82,6 +101,20 @@ private fun RowScope.TextCell(
         fontWeight = fontWeight,
         style = style
     )
+}
+
+@Composable
+private fun RowScope.BoxCell(
+    weight: Float,
+    content: @Composable () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .weight(weight)
+            .fillMaxWidth(),
+    ) {
+        content()
+    }
 }
 
 @Preview

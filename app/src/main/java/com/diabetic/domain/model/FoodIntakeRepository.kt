@@ -7,4 +7,5 @@ interface FoodIntakeRepository {
     fun fetch(id: Int): FoodIntake?
     fun fetch(): List<FoodIntake>
     fun fetch(from: LocalDateTime, to: LocalDateTime): List<FoodIntake>
+    fun delete(id: Int)
 }

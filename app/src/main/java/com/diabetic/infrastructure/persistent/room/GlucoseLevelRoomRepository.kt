@@ -7,13 +7,14 @@ import com.diabetic.domain.model.iso
 import java.time.LocalDateTime
 
 class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDao) : GlucoseLevelRepository {
-    override fun fetch(): List<GlucoseLevel> {
-        return dao.all().map { it.cast() }
-    }
+    override fun fetch(id: Int): GlucoseLevel? =
+        dao.fetch(id)?.cast()
 
-    override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
-        return dao.all(from.iso(), to.iso()).map { it.cast() }
-    }
+    override fun fetch(): List<GlucoseLevel> =
+        dao.fetch().map { it.cast() }
+
+    override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> =
+        dao.fetch(from.iso(), to.iso()).map { it.cast() }
 
     override fun persist(glucoseLevel: GlucoseLevel) {
         dao.insert(
@@ -23,6 +24,12 @@ class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDao) : GlucoseLeve
                 value = glucoseLevel.value.level
             )
         )
+    }
+
+    override fun delete(id: Int) {
+        dao.fetch(id)?.also {
+            dao.delete(it)
+        }
     }
 
     private fun GlucoseLevelEntity.cast() = GlucoseLevel(

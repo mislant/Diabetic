@@ -18,4 +18,8 @@ class FoodIntakeReport(
     private fun fetch(): List<FoodIntake> {
         return repository.fetch()
     }
+
+    override fun delete(element: FoodIntake) {
+        repository.delete(element.id!!)
+    }
 }

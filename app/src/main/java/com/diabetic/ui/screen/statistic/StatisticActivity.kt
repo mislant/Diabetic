@@ -84,7 +84,7 @@ private fun Content(
                     state.filter,
                     filter = model::filter
                 )
-                ReportTable(state)
+                ReportTable(state, removeRecord = model::deleteRecord)
                 ExportButton(exportReport)
             }
         }

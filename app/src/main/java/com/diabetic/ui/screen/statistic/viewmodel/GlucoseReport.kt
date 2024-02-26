@@ -19,4 +19,8 @@ class GlucoseReport(
     private fun fetch(): List<GlucoseLevel> {
         return repository.fetch()
     }
+
+    override fun delete(element: GlucoseLevel) {
+        repository.delete(element.id!!)
+    }
 }

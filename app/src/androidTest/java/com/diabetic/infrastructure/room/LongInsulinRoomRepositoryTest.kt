@@ -5,6 +5,7 @@ import com.diabetic.domain.model.LongInsulin
 import com.diabetic.domain.model.dateTime
 import com.diabetic.infrastructure.persistent.room.LongInsulinRoomRepository
 import org.junit.After
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -30,7 +31,7 @@ class LongInsulinRoomRepositoryTest : RoomRepositoryTest() {
         repository.persist(longInsulin)
         val savedEntity = db
             .longInsulinDao()
-            .fetch(1)
+            .fetch(1)!!
 
         assertEquals(longInsulin.id, savedEntity.id)
         assertEquals(longInsulin.value, savedEntity.value)
@@ -84,5 +85,18 @@ class LongInsulinRoomRepositoryTest : RoomRepositoryTest() {
         assertEquals(2, fetched.count())
         assertEquals(dates[1], fetched[0].datetime.format().iso())
         assertEquals(dates[2], fetched[1].datetime.format().iso())
+    }
+
+    @Test
+    fun `delete long insulin record`() {
+        val savedId: Int
+        val repository = LongInsulinRoomRepository(db.longInsulinDao()).apply {
+            savedId = persist(LongInsulin(value = 1.2F)).id!!
+        }
+
+        repository.delete(savedId)
+        val result = repository.fetch(savedId)
+
+        Assert.assertNull(result)
     }
 }

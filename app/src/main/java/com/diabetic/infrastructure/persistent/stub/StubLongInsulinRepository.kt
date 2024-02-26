@@ -23,4 +23,14 @@ class StubLongInsulinRepository : LongInsulinRepository, InMemoryStorage<LongIns
                     it.datetime.localDataTime() < to
         }.toList()
     }
+
+    override fun fetch(id: Int): LongInsulin? = storage.find {
+        it.id == id
+    }
+
+    override fun delete(id: Int) {
+        fetch(id)?.also {
+            storage.remove(it)
+        }
+    }
 }

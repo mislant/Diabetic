@@ -9,7 +9,7 @@ class Strategies(
     private val foodIntakeReport: FoodIntakeReport,
     private val longInsulinReport: LongInsulinReport
 ) {
-    fun of(state: ReportState<out Any>): ReportStrategy<out Any> {
+    fun of(state: ReportState<Any>): ReportStrategy<Any> {
         return when (state) {
             is FoodIntakes -> foodIntakeReport
             is GlucoseLevels -> glucoseReport

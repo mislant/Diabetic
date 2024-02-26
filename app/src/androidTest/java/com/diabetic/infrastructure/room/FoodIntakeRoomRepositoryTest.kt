@@ -10,6 +10,7 @@ import com.diabetic.infrastructure.persistent.room.FoodIntakeRoomRepository
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
@@ -92,5 +93,19 @@ class FoodIntakeRoomRepositoryTest : RoomRepositoryTest() {
 
         assertTrue(fetched.isNotEmpty())
         assertEquals(2, fetched.count())
+    }
+
+    @Test
+    fun `delete food intake record`() {
+        val savedId: Int
+        val repository = FoodIntakeRoomRepository(db.foodIntakeDao()).apply {
+            savedId = persist(FoodIntake(breadUnit = BreadUnit(1), insulin = ShortInsulin(1.2F)))
+                .id!!
+        }
+
+        repository.delete(savedId)
+        val result = repository.fetch(savedId)
+
+        assertNull(result)
     }
 }

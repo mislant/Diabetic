@@ -27,4 +27,8 @@ class StubFoodIntakeRepository : InMemoryStorage<FoodIntake>(), FoodIntakeReposi
                     it.date.localDataTime() < to
         }
     }
+
+    override fun delete(id: Int) {
+        storage.removeAt(id)
+    }
 }

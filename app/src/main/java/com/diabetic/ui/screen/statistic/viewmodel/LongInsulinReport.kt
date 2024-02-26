@@ -18,4 +18,8 @@ class LongInsulinReport(
     private fun fetch(): List<LongInsulin> {
         return repository.fetch()
     }
+
+    override fun delete(element: LongInsulin) {
+        repository.delete(element.id!!)
+    }
 }

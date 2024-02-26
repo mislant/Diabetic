@@ -19,4 +19,11 @@ class StubGlucoseLevelRepository : InMemoryStorage<GlucoseLevel>(), GlucoseLevel
     override fun persist(glucoseLevel: GlucoseLevel) {
         storage.add(glucoseLevel)
     }
+
+    override fun fetch(id: Int): GlucoseLevel? =
+        storage.find { it.id == id }
+
+    override fun delete(id: Int) {
+        storage.removeAt(id)
+    }
 }

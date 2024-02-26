@@ -4,7 +4,7 @@ import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.LongInsulin as DomainLongInsulin
 
-sealed class ReportState<T>(
+sealed class ReportState<out T>(
     val of: Report,
     val data: List<T> = listOf(),
     val filter: LongRange? = null,
@@ -17,13 +17,16 @@ sealed class ReportState<T>(
             override fun state(): ReportState<FoodIntake> = FoodIntakes()
         },
         LONG_INSULIN("Длинный инсулин") {
-            override fun state(): ReportState<out Any> = LongInsulin()
+            override fun state(): ReportState<DomainLongInsulin> = LongInsulin()
         };
 
-        abstract fun state(): ReportState<out Any>
+        abstract fun state(): ReportState<Any>
     }
 
-    abstract fun copy(data: List<T> = this.data, filter: LongRange? = this.filter): ReportState<T>
+    abstract fun copy(
+        data: List<@UnsafeVariance T> = this.data,
+        filter: LongRange? = this.filter
+    ): ReportState<T>
 
     override fun toString(): String {
         return "ReportState(of=$of, data=$data, filter=$filter)"

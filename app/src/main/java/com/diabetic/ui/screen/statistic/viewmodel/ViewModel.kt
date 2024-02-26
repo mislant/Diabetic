@@ -9,14 +9,14 @@ import androidx.lifecycle.ViewModel as AndroidViewModel
 
 class ViewModel(
     private val strategies: Strategies,
-    initial: ReportState<out Any> = ReportState.GlucoseLevels()
+    initial: ReportState<Any> = ReportState.GlucoseLevels()
 ) : AndroidViewModel() {
-    private val strategy: ReportStrategy<out Any>
+    private val strategy: ReportStrategy<Any>
         get() = strategies.of(_state.value)
-    private val states: MutableMap<ReportState.Report, ReportState<out Any>> = mutableMapOf()
+    private val states: MutableMap<ReportState.Report, ReportState<Any>> = mutableMapOf()
 
     private val _state = MutableStateFlow(initial)
-    private var value: ReportState<out Any>
+    private var value: ReportState<Any>
         get() = _state.value
         set(value) {
             _state.value = value
@@ -61,14 +61,13 @@ class ViewModel(
 
     private fun updateData() {
         value = value.copy(
-            data = fetch()
+            data = fetch(value.filter)
         )
     }
 
-    private fun fetch(filter: LongRange? = null): List<Nothing> {
-        @Suppress("UNCHECKED_CAST")
+    private fun fetch(filter: LongRange? = null): List<Any> {
         return strategy
-            .fetch(filter) as List<Nothing>
+            .fetch(filter)
     }
 
     fun generateReportName(): String {
@@ -80,6 +79,12 @@ class ViewModel(
             value.filter,
             stream
         )
+    }
+
+    fun deleteRecord(elementIndex: Int) {
+        val element: Any = value.data.getOrNull(elementIndex) ?: return
+        strategy.delete(element)
+        updateData()
     }
 
     companion object {

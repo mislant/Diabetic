@@ -32,7 +32,7 @@ fun TopBar(current: ReportState.Report, onTabClick: (ReportState.Report) -> Unit
             containerColor = MaterialTheme.colorScheme.background,
             selectedTabIndex = current.ordinal
         ) {
-            ReportState.Report.entries.forEachIndexed { index, listed ->
+            ReportState.Report.entries.forEach { listed ->
                 Tab(
                     selected = current.ordinal == listed.ordinal,
                     onClick = { onTabClick(listed) }

@@ -6,8 +6,8 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.TimeZone
 
-sealed class ReportStrategy<T> {
-    abstract fun fetch(filter: LongRange?): List<T>
+sealed class ReportStrategy<out T> {
+    abstract fun fetch(filter: LongRange?): List<@UnsafeVariance T>
 
     protected val LongRange.from get() = this.first
     protected val LongRange.to get() = this.last
@@ -27,7 +27,7 @@ sealed class ReportStrategy<T> {
 
     protected abstract val handler: PrepareReport.Handler
 
-    fun generateReportName(filter: LongRange?): String{
+    fun generateReportName(filter: LongRange?): String {
         return handler.handle(
             PrepareReport.GenerateFileNameCommand(
                 if (filter == null) null else Pair(
@@ -49,4 +49,6 @@ sealed class ReportStrategy<T> {
             )
         )
     }
+
+    abstract fun delete(element: @UnsafeVariance T)
 }

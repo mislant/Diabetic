@@ -3,6 +3,8 @@ package com.diabetic.infrastructure.room
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
+import com.diabetic.domain.model.GlucoseLevel.MeasureType
+import com.diabetic.domain.model.GlucoseLevel.Value
 import com.diabetic.infrastructure.persistent.room.GlucoseLevelRoomRepository
 import org.junit.After
 import org.junit.Assert.*
@@ -29,13 +31,13 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
     fun `save glucose level`() {
         val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao())
         val glucoseLevel = GlucoseLevel(
-            GlucoseLevel.MeasureType.BEFORE_MEAL,
-            GlucoseLevel.Value(1.2F),
+            MeasureType.BEFORE_MEAL,
+            Value(1.2F),
             DateTime()
         )
 
         repository.persist(glucoseLevel)
-        val savedGlucoseLevel = db.glucoseLevelDao().byId(1)
+        val savedGlucoseLevel = db.glucoseLevelDao().fetch(1)!!
 
         assertEquals(1, savedGlucoseLevel.id)
         assertEquals("before_meal", savedGlucoseLevel.measureType)
@@ -49,8 +51,8 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
         repeat(3) {
             prepared.add(
                 GlucoseLevel(
-                    GlucoseLevel.MeasureType.BEFORE_MEAL,
-                    GlucoseLevel.Value(1.2F),
+                    MeasureType.BEFORE_MEAL,
+                    Value(1.2F),
                     DateTime()
                 ),
             )
@@ -84,8 +86,8 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
         )
         val stored = List(4) { i ->
             GlucoseLevel(
-                GlucoseLevel.MeasureType.BEFORE_MEAL,
-                GlucoseLevel.Value(1.2F),
+                MeasureType.BEFORE_MEAL,
+                Value(1.2F),
                 DateTime.fromString(dates[i])
             ).also { repository.persist(it) }
         }
@@ -105,5 +107,24 @@ class GlucoseLevelRoomRepositoryTest : RoomRepositoryTest() {
             assertEquals(concretePrepared.value, concreteFetched.value)
             assertEquals(concretePrepared.type, concreteFetched.type)
         }
+    }
+
+    @Test
+    fun `delete glucose record`() {
+        val savedId: Int = 0
+        val repository = GlucoseLevelRoomRepository(db.glucoseLevelDao()).apply {
+            persist(
+                GlucoseLevel(
+                    type = MeasureType.BEFORE_MEAL,
+                    value = Value(1.2F),
+                    date = DateTime()
+                )
+            )
+        }
+
+        repository.delete(savedId)
+        val result = repository.fetch(savedId)
+
+        assertNull(result)
     }
 }
