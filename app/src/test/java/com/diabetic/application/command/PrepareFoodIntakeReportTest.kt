@@ -6,7 +6,7 @@ import com.diabetic.application.command.PrepareReport.WriteReportCommand
 import com.diabetic.domain.model.BreadUnit
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.ShortInsulin
-import com.diabetic.domain.model.dateTime
+import com.diabetic.domain.model.time.datetime
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import org.junit.Assert
 import org.junit.Test
@@ -51,10 +51,10 @@ class PrepareFoodIntakeReportTest {
                 "2024-01-03 00:00:00.000"
             ).mapIndexed { id, date ->
                 FoodIntake(
-                    id,
-                    BreadUnit(1),
-                    ShortInsulin(1.2F),
-                    date.dateTime
+                    id = id,
+                    breadUnit = BreadUnit(1),
+                    insulin = ShortInsulin(1.2F),
+                    datetime = date.datetime
                 )
             }
         }
@@ -79,10 +79,10 @@ class PrepareFoodIntakeReportTest {
                 "2024-01-03 00:00:00.000"
             ).mapIndexed { id, date ->
                 FoodIntake(
-                    id,
-                    BreadUnit(1),
-                    ShortInsulin(1.2F),
-                    date.dateTime
+                    id = id,
+                    breadUnit = BreadUnit(1),
+                    insulin = ShortInsulin(1.2F),
+                    datetime = date.datetime
                 )
             }
         }

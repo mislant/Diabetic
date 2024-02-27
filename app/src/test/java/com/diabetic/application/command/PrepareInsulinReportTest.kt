@@ -4,7 +4,7 @@ import com.diabetic.application.command.PrepareLongInsulinReport.Handler
 import com.diabetic.application.command.PrepareReport.GenerateFileNameCommand
 import com.diabetic.application.command.PrepareReport.WriteReportCommand
 import com.diabetic.domain.model.LongInsulin
-import com.diabetic.domain.model.dateTime
+import com.diabetic.domain.model.time.datetime
 import com.diabetic.infrastructure.persistent.stub.StubLongInsulinRepository
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -50,7 +50,7 @@ class PrepareInsulinReportTest {
             ).onEach { date ->
                 LongInsulin(
                     value = 1.2F,
-                    datetime = date.dateTime,
+                    datetime = date.datetime,
                 ).also {
                     repository.persist(it)
                 }
@@ -78,7 +78,7 @@ class PrepareInsulinReportTest {
             ).onEach { date ->
                 LongInsulin(
                     value = 1.2F,
-                    datetime = date.dateTime,
+                    datetime = date.datetime,
                 ).also {
                     repository.persist(it)
                 }

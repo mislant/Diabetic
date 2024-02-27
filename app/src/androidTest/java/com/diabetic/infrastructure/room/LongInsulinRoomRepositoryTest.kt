@@ -2,7 +2,8 @@ package com.diabetic.infrastructure.room
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.diabetic.domain.model.LongInsulin
-import com.diabetic.domain.model.dateTime
+import com.diabetic.domain.model.time.datetime
+import com.diabetic.domain.model.time.iso
 import com.diabetic.infrastructure.persistent.room.LongInsulinRoomRepository
 import org.junit.After
 import org.junit.Assert
@@ -35,7 +36,7 @@ class LongInsulinRoomRepositoryTest : RoomRepositoryTest() {
 
         assertEquals(longInsulin.id, savedEntity.id)
         assertEquals(longInsulin.value, savedEntity.value)
-        assertEquals(longInsulin.datetime.format().iso(), savedEntity.date)
+        assertEquals(longInsulin.datetime.iso, savedEntity.datetime.datetime.iso)
     }
 
     @Test
@@ -54,8 +55,8 @@ class LongInsulinRoomRepositoryTest : RoomRepositoryTest() {
             assertEquals(prepared[it].id, fetched[it].id)
             assertEquals(prepared[it].value, fetched[it].value)
             assertEquals(
-                prepared[it].datetime.format().iso(),
-                fetched[it].datetime.format().iso()
+                prepared[it].datetime.iso,
+                fetched[it].datetime.iso
             )
         }
     }
@@ -71,20 +72,20 @@ class LongInsulinRoomRepositoryTest : RoomRepositoryTest() {
         ).onEach { date ->
             LongInsulin(
                 value = 1.2F,
-                datetime = date.dateTime
+                datetime = date.datetime
             ).also {
                 repository.persist(it)
             }
         }
 
         val fetched = repository.fetch(
-            "2024-01-02 00:00:00.000".dateTime.localDataTime(),
-            "2024-01-02 23:59:59.000".dateTime.localDataTime(),
+            "2024-01-02 00:00:00.000".datetime,
+            "2024-01-02 23:59:59.000".datetime,
         )
 
         assertEquals(2, fetched.count())
-        assertEquals(dates[1], fetched[0].datetime.format().iso())
-        assertEquals(dates[2], fetched[1].datetime.format().iso())
+        assertEquals(dates[1], fetched[0].datetime.iso)
+        assertEquals(dates[2], fetched[1].datetime.iso)
     }
 
     @Test

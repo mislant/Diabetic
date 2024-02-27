@@ -15,7 +15,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.diabetic.application.command.PrepareFoodIntakeReport
 import com.diabetic.application.command.PrepareGlucoseLevelsReport
 import com.diabetic.application.command.PrepareLongInsulinReport
-import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.LongInsulin
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
@@ -32,6 +31,7 @@ import com.diabetic.ui.screen.statistic.viewmodel.LongInsulinReport
 import com.diabetic.ui.screen.statistic.viewmodel.ReportState
 import com.diabetic.ui.screen.statistic.viewmodel.Strategies
 import com.diabetic.ui.theme.DiabeticMaterialTheme
+import java.time.LocalDateTime
 import com.diabetic.ui.screen.statistic.viewmodel.ViewModel as InternalViewModel
 
 class StatisticActivity : ComponentActivity() {
@@ -97,10 +97,9 @@ private fun GlucoseReportContentPreview() {
     val repository = StubGlucoseLevelRepository().apply {
         List(30) { id ->
             GlucoseLevel(
-                GlucoseLevel.MeasureType.BEFORE_MEAL,
-                GlucoseLevel.Value(1.2F),
-                DateTime(),
-                id
+                type = GlucoseLevel.MeasureType.BEFORE_MEAL,
+                value = GlucoseLevel.Value(1.2F),
+                id = id
             ).also { persist(it) }
         }
     }
@@ -133,7 +132,6 @@ private fun LongInsulinReportContentPreview() {
         List(30) { id ->
             LongInsulin(
                 id = id,
-                datetime = DateTime(),
                 value = 1.2F
             ).also { persist(it) }
         }

@@ -2,8 +2,8 @@ package com.diabetic.infrastructure.persistent.room
 
 import com.diabetic.domain.model.LongInsulin
 import com.diabetic.domain.model.LongInsulinRepository
-import com.diabetic.domain.model.dateTime
-import com.diabetic.domain.model.iso
+import com.diabetic.domain.model.time.datetime
+import com.diabetic.domain.model.time.milliseconds
 import java.time.LocalDateTime
 
 class LongInsulinRoomRepository(private val dao: LongInsulinDao) : LongInsulinRepository {
@@ -15,7 +15,7 @@ class LongInsulinRoomRepository(private val dao: LongInsulinDao) : LongInsulinRe
 
 
     override fun fetch(from: LocalDateTime, to: LocalDateTime): List<LongInsulin> =
-        dao.fetch(from.iso(), to.iso()).map { it.cast() }
+        dao.fetch(from.milliseconds, to.milliseconds).map { it.cast() }
 
     override fun fetch(id: Int): LongInsulin? =
         dao.fetch(id)?.cast()
@@ -29,12 +29,12 @@ class LongInsulinRoomRepository(private val dao: LongInsulinDao) : LongInsulinRe
     private fun LongInsulin.entity(): LongInsulinEntity = LongInsulinEntity(
         id = 0,
         value = value,
-        date = datetime.format().iso()
+        datetime = datetime.milliseconds
     )
 
     private fun LongInsulinEntity.cast(): LongInsulin = LongInsulin(
         id = id,
         value = value,
-        datetime = date.dateTime
+        datetime = datetime.datetime
     )
 }

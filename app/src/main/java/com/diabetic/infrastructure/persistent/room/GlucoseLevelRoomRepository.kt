@@ -1,9 +1,9 @@
 package com.diabetic.infrastructure.persistent.room
 
-import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.GlucoseLevelRepository
-import com.diabetic.domain.model.iso
+import com.diabetic.domain.model.time.datetime
+import com.diabetic.domain.model.time.milliseconds
 import java.time.LocalDateTime
 
 class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDao) : GlucoseLevelRepository {
@@ -14,13 +14,13 @@ class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDao) : GlucoseLeve
         dao.fetch().map { it.cast() }
 
     override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> =
-        dao.fetch(from.iso(), to.iso()).map { it.cast() }
+        dao.fetch(from.milliseconds, to.milliseconds).map { it.cast() }
 
     override fun persist(glucoseLevel: GlucoseLevel) {
         dao.insert(
             GlucoseLevelEntity(
                 measureType = glucoseLevel.type.toString(),
-                date = glucoseLevel.date.format().iso(),
+                datetime = glucoseLevel.datetime.milliseconds,
                 value = glucoseLevel.value.level
             )
         )
@@ -36,7 +36,7 @@ class GlucoseLevelRoomRepository(private val dao: GlucoseLevelDao) : GlucoseLeve
         id = id,
         type = GlucoseLevel.MeasureType.from(measureType),
         value = GlucoseLevel.Value(value),
-        date = DateTime.fromString(date)
+        datetime = datetime.datetime
     )
 }
 

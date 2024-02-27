@@ -3,7 +3,7 @@ package com.diabetic.domain.service
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.LongInsulin
-import com.diabetic.domain.model.readable
+import com.diabetic.domain.model.time.readable
 import org.apache.poi.ss.usermodel.BorderStyle
 import org.apache.poi.ss.usermodel.CellStyle
 import org.apache.poi.ss.usermodel.FillPatternType
@@ -102,7 +102,7 @@ private sealed class Report<T> {
                 if (meta.range == null) {
                     "за все время"
                 } else {
-                    "с ${meta.range.from.readable()} по ${meta.range.to.readable()}"
+                    "с ${meta.range.from.readable} по ${meta.range.to.readable}"
                 }
             )
         )
@@ -181,7 +181,7 @@ private data object GlucoseReport : Report<GlucoseLevel>() {
         }
         createCell(2).also {
             it.cellStyle = style
-            it.setCellValue(data.date.format().readable())
+            it.setCellValue(data.datetime.readable)
         }
         createCell(3).also {
             it.cellStyle = style
@@ -217,7 +217,7 @@ private data object FoodIntakeReport : Report<FoodIntake>() {
         }
         createCell(3).also {
             it.cellStyle = style
-            it.setCellValue(data.date.format().readable())
+            it.setCellValue(data.datetime.readable)
         }
     }
 
@@ -243,7 +243,7 @@ private data object LongInsulinReport : Report<LongInsulin>() {
         }
         createCell(2).also {
             it.cellStyle = style
-            it.setCellValue(data.datetime.format().readable())
+            it.setCellValue(data.datetime.readable)
         }
     }
 

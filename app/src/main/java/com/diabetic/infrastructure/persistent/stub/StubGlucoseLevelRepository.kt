@@ -11,8 +11,8 @@ class StubGlucoseLevelRepository : InMemoryStorage<GlucoseLevel>(), GlucoseLevel
 
     override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
         return storage.toList().filter {
-            it.date.localDataTime() > from &&
-                    it.date.localDataTime() < to
+            it.datetime > from &&
+                    it.datetime < to
         }
     }
 

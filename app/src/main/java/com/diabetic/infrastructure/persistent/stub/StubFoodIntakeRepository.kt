@@ -23,8 +23,8 @@ class StubFoodIntakeRepository : InMemoryStorage<FoodIntake>(), FoodIntakeReposi
 
     override fun fetch(from: LocalDateTime, to: LocalDateTime): List<FoodIntake> {
         return storage.filter {
-            it.date.localDataTime() > from &&
-                    it.date.localDataTime() < to
+            it.datetime > from &&
+                    it.datetime < to
         }
     }
 

@@ -8,5 +8,5 @@ import androidx.room.PrimaryKey
 class LongInsulinEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "value") val value: Float,
-    @ColumnInfo(name = "datetime") val date: String
+    @ColumnInfo(name = "datetime") val datetime: Long
 )

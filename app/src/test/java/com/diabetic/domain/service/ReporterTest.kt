@@ -1,7 +1,6 @@
 package com.diabetic.domain.service
 
 import com.diabetic.domain.model.BreadUnit
-import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.LongInsulin
@@ -29,7 +28,6 @@ class ReporterTest {
                 id = id,
                 value = GlucoseLevel.Value(1.2F),
                 type = GlucoseLevel.MeasureType.BEFORE_MEAL,
-                date = DateTime()
             )
         }
         val report = File("src/test/res/runtime/glucose_test_report.xlsx")
@@ -55,10 +53,9 @@ class ReporterTest {
         )
         val foodIntakes = List(3) { id ->
             FoodIntake(
-                id,
-                BreadUnit(1),
-                ShortInsulin(1.2F),
-                DateTime()
+                id = id,
+                breadUnit = BreadUnit(1),
+                insulin = ShortInsulin(1.2F),
             )
         }
         val report = File("src/test/res/runtime/food_intake_test_report.xlsx")
@@ -84,7 +81,6 @@ class ReporterTest {
             LongInsulin(
                 id = id,
                 value = 1.2F,
-                datetime = DateTime()
             )
         }
         val report = File("src/test/res/runtime/insulin_test_report.xlsx")

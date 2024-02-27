@@ -2,6 +2,7 @@ package com.diabetic.infrastructure.persistent.stub
 
 import com.diabetic.domain.model.LongInsulin
 import com.diabetic.domain.model.LongInsulinRepository
+import com.diabetic.domain.model.time.milliseconds
 import java.time.LocalDateTime
 
 class StubLongInsulinRepository : LongInsulinRepository, InMemoryStorage<LongInsulin>() {
@@ -19,8 +20,8 @@ class StubLongInsulinRepository : LongInsulinRepository, InMemoryStorage<LongIns
 
     override fun fetch(from: LocalDateTime, to: LocalDateTime): List<LongInsulin> {
         return storage.filter {
-            it.datetime.localDataTime() > from &&
-                    it.datetime.localDataTime() < to
+            it.datetime > from &&
+                    it.datetime < to
         }.toList()
     }
 

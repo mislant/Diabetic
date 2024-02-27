@@ -35,11 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.diabetic.domain.model.time.datetime
+import com.diabetic.domain.model.time.readableDate
 import com.diabetic.ui.theme.DiabeticMaterialTheme
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @Composable
 fun DateRangeFilter(
@@ -80,13 +78,13 @@ private fun Title() {
 private fun DateRangeFields(initial: LongRange?, filter: (Long?, Long?) -> Unit) {
     var pickerShown by remember { mutableStateOf(false) }
 
-    val initialFrom = initial?.first?.localDateTime?.asDate() ?: ""
-    val initialTo = initial?.last?.localDateTime?.asDate() ?: ""
+    val initialFrom = initial?.first?.datetime?.readableDate ?: ""
+    val initialTo = initial?.last?.datetime?.readableDate ?: ""
 
-    var from by remember { mutableStateOf(initialFrom) }.apply {
+    val from by remember { mutableStateOf(initialFrom) }.apply {
         value = initialFrom
     }
-    var to by remember { mutableStateOf(initialTo) }.apply {
+    val to by remember { mutableStateOf(initialTo) }.apply {
         value = initialTo
     }
 
@@ -157,16 +155,6 @@ private fun DateRangeFields(initial: LongRange?, filter: (Long?, Long?) -> Unit)
         }
     }
 }
-
-private val Long.localDateTime: LocalDateTime
-    get() {
-        return Instant.ofEpochMilli(this)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime()
-    }
-
-private fun LocalDateTime.asDate(): String =
-    this.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
 
 @Composable
 private fun DateInput(

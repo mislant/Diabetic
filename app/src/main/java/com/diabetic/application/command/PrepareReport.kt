@@ -1,6 +1,6 @@
 package com.diabetic.application.command
 
-import com.diabetic.domain.model.readableDate
+import com.diabetic.domain.model.time.readableDate
 import com.diabetic.domain.service.ReportMeta
 import java.io.OutputStream
 import java.time.LocalDateTime
@@ -26,7 +26,7 @@ abstract class PrepareReport {
                 template.format("for_all_time")
             } else {
                 template.format(
-                    "${range.from.readableDate()}_${range.to.readableDate()}"
+                    "${range.from.readableDate}_${range.to.readableDate}"
                 )
             }
         }

@@ -30,10 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import java.time.Instant
+import com.diabetic.domain.model.time.datetime
+import com.diabetic.domain.model.time.readableDate
+import com.diabetic.domain.model.time.readableTime
 import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,13 +47,13 @@ fun DateTimePicker(
         mutableStateOf(false)
     }
     var date by remember {
-        mutableStateOf(now.asDate())
+        mutableStateOf(now.readableDate)
     }
     var showTimePicker by remember {
         mutableStateOf(false)
     }
     var time by remember {
-        mutableStateOf(now.asTime())
+        mutableStateOf(now.readableTime)
     }
 
     Row(
@@ -107,8 +107,8 @@ fun DateTimePicker(
         val confirm = {
             date = datePickerState
                 .selectedDateMillis
-                ?.toLocalDateTime()
-                ?.asDate() ?: date
+                ?.datetime
+                ?.readableDate ?: date
             onDateChange(datePickerState.selectedDateMillis)
             showDatePicker = false
         }
@@ -162,15 +162,3 @@ fun DateTimePicker(
         }
     }
 }
-
-private fun Long.toLocalDateTime(): LocalDateTime {
-    return Instant.ofEpochMilli(this)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime()
-}
-
-private fun LocalDateTime.asDate(): String =
-    this.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-
-private fun LocalDateTime.asTime(): String =
-    this.format(DateTimeFormatter.ofPattern("HH:mm"))

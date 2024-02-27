@@ -13,11 +13,11 @@ interface LongInsulinDao {
     @Query("SELECT * FROM long_insulin WHERE id=:id")
     fun fetch(id: Int): LongInsulinEntity?
 
-    @Query("SELECT * FROM long_insulin")
+    @Query("SELECT * FROM long_insulin ORDER BY datetime")
     fun fetch(): List<LongInsulinEntity>
 
     @Query("SELECT * FROM long_insulin WHERE datetime BETWEEN :from AND :to ORDER BY datetime")
-    fun fetch(from: String, to: String): List<LongInsulinEntity>
+    fun fetch(from: Long, to: Long): List<LongInsulinEntity>
 
     @Delete
     fun delete(longInsulin: LongInsulinEntity)

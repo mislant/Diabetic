@@ -1,9 +1,7 @@
 package com.diabetic.application.command
 
-import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.LongInsulin
 import com.diabetic.domain.model.LongInsulinRepository
-import com.diabetic.domain.model.toDateTime
 import java.time.LocalDateTime
 
 class AddLongInsulin {
@@ -16,9 +14,7 @@ class AddLongInsulin {
         private val repository: LongInsulinRepository
     ) {
         fun handle(command: Command) {
-            val datetime =
-                if (command.datetime == null) DateTime()
-                else command.datetime.toDateTime()
+            val datetime = command.datetime ?: LocalDateTime.now()
 
             val insulin = LongInsulin(
                 value = command.value,

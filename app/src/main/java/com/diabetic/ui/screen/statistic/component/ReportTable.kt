@@ -18,10 +18,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import com.diabetic.domain.model.BreadUnit
-import com.diabetic.domain.model.DateTime
 import com.diabetic.domain.model.FoodIntake
 import com.diabetic.domain.model.GlucoseLevel
 import com.diabetic.domain.model.ShortInsulin
+import com.diabetic.domain.model.time.readableDate
 import com.diabetic.ui.screen.statistic.viewmodel.ReportState
 import com.diabetic.ui.screen.statistic.viewmodel.ReportState.FoodIntakes
 import com.diabetic.ui.screen.statistic.viewmodel.ReportState.GlucoseLevels
@@ -61,7 +61,7 @@ private fun GlucoseLevelsTable(
                         GlucoseLevel.MeasureType.AFTER_MEAL -> "После"
                         GlucoseLevel.MeasureType.UNSPECIFIED -> "-"
                     },
-                    level.date.format().readableDate(),
+                    level.datetime.readableDate,
                 )
             },
             actions = { rowNumber ->
@@ -95,7 +95,7 @@ private fun FoodIntakeTable(foodIntakes: List<FoodIntake>, removeRecord: (rowInd
                     (i + 1).toString(),
                     foodIntake.insulin.value.toString(),
                     foodIntake.breadUnit.value.toString(),
-                    foodIntake.date.format().readableDate()
+                    foodIntake.datetime.readableDate
                 )
             },
             actions = { rowNumber ->
@@ -131,7 +131,7 @@ private fun LongInsulinTable(
                 listOf(
                     (i + 1).toString(),
                     longInsulin.value.toString(),
-                    longInsulin.datetime.format().readableDate()
+                    longInsulin.datetime.readableDate
                 )
             },
             actions = { rowNumber ->
@@ -174,7 +174,6 @@ private fun PreviewGlucoseLevelsTable() {
             GlucoseLevel(
                 type = GlucoseLevel.MeasureType.BEFORE_MEAL,
                 value = GlucoseLevel.Value(1.2F),
-                date = DateTime(),
                 id = it
             )
         }
@@ -191,7 +190,6 @@ private fun PreviewFoodIntakesTable() {
                     id = it,
                     breadUnit = BreadUnit(1),
                     insulin = ShortInsulin(1.2F),
-                    date = DateTime()
                 )
             }
         ),
@@ -208,7 +206,6 @@ private fun PreviewLongInsulinTable() {
                 DomainLongInsulin(
                     id = it,
                     value = 1F,
-                    datetime = DateTime()
                 )
             }
         ),

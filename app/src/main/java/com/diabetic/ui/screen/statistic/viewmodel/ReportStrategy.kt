@@ -1,6 +1,7 @@
 package com.diabetic.ui.screen.statistic.viewmodel
 
 import com.diabetic.application.command.PrepareReport
+import com.diabetic.domain.model.time.datetime
 import java.io.OutputStream
 import java.time.Instant
 import java.time.LocalDateTime
@@ -12,18 +13,13 @@ sealed class ReportStrategy<out T> {
     protected val LongRange.from get() = this.first
     protected val LongRange.to get() = this.last
 
-    protected fun Long.asFromLocalDateTime(): LocalDateTime = this.asLocalDateTime()
+    protected fun Long.asFromLocalDateTime(): LocalDateTime = this.datetime
         .toLocalDate()
         .atTime(0, 0)
 
-    protected fun Long.asToLocalDateTime(): LocalDateTime = this.asLocalDateTime()
+    protected fun Long.asToLocalDateTime(): LocalDateTime = this.datetime
         .toLocalDate()
         .atTime(23, 59)
-
-    protected fun Long.asLocalDateTime(): LocalDateTime = LocalDateTime.ofInstant(
-        Instant.ofEpochMilli(this),
-        TimeZone.getDefault().toZoneId()
-    )
 
     protected abstract val handler: PrepareReport.Handler
 

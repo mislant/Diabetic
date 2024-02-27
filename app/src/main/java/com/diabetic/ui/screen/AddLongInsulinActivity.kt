@@ -32,6 +32,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.diabetic.application.command.AddLongInsulin.Command
 import com.diabetic.application.command.AddLongInsulin.Handler
+import com.diabetic.domain.model.time.datetime
 import com.diabetic.infrastructure.persistent.stub.StubLongInsulinRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DateTimePicker
@@ -39,7 +40,6 @@ import com.diabetic.ui.screen.component.DiabeticLayout
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -222,7 +222,7 @@ private class AddLongInsulinViewModel(
             handler.handle(
                 Command(
                     value.toFloat(),
-                    _state.value.datetime.toLocalDateTime()
+                    _state.value.datetime.datetime
                 )
             )
             true
@@ -231,12 +231,6 @@ private class AddLongInsulinViewModel(
             Log.e(null, e.toString())
             false
         }
-    }
-
-    private fun Long.toLocalDateTime(): LocalDateTime {
-        return Instant.ofEpochMilli(this)
-            .atZone(ZoneId.systemDefault())
-            .toLocalDateTime()
     }
 
     fun flushError() {

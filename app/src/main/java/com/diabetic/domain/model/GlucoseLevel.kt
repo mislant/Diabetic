@@ -1,21 +1,13 @@
 package com.diabetic.domain.model
 
+import java.time.LocalDateTime
+
 data class GlucoseLevel(
     var type: MeasureType,
     var value: Value,
-    var date: DateTime
-) {
+    var datetime: LocalDateTime = LocalDateTime.now(),
     var id: Int? = null
-
-    constructor(
-        type: MeasureType,
-        value: Value,
-        date: DateTime,
-        id: Int
-    ) : this(type, value, date) {
-        this.id = id
-    }
-
+) {
     enum class MeasureType {
         BEFORE_MEAL,
         AFTER_MEAL,
