@@ -1,4 +1,4 @@
 package com.diabetic.domain.model
 
 @JvmInline
-value class Insulin(val value: Float)
+value class ShortInsulin(val value: Float)

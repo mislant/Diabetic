@@ -1,34 +1,17 @@
 package com.diabetic.domain.model
 
+import java.time.LocalDateTime
+
 data class GlucoseLevel(
     var type: MeasureType,
     var value: Value,
-    var date: DateTime
-) {
+    var datetime: LocalDateTime = LocalDateTime.now(),
     var id: Int? = null
-
-    constructor(
-        type: MeasureType,
-        value: Value,
-        date: DateTime,
-        id: Int
-    ) : this(type, value, date) {
-        this.id = id
-    }
-
-    companion object {
-        fun beforeMeal(value: Value, datetime: DateTime): GlucoseLevel {
-            return GlucoseLevel(MeasureType.BEFORE_MEAL, value, datetime)
-        }
-
-        fun afterMeal(value: Value, datetime: DateTime): GlucoseLevel {
-            return GlucoseLevel(MeasureType.BEFORE_MEAL, value, datetime)
-        }
-    }
-
+) {
     enum class MeasureType {
         BEFORE_MEAL,
-        AFTER_MEAL;
+        AFTER_MEAL,
+        UNSPECIFIED;
 
         companion object {
             fun from(string: String): MeasureType {
@@ -40,6 +23,7 @@ data class GlucoseLevel(
             return when (this) {
                 BEFORE_MEAL -> "before_meal"
                 AFTER_MEAL -> "after_meal"
+                UNSPECIFIED -> "unspecified"
             }
         }
     }

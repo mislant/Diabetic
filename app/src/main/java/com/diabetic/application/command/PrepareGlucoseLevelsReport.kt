@@ -1,40 +1,21 @@
 package com.diabetic.application.command
 
 import com.diabetic.domain.model.GlucoseLevelRepository
-import com.diabetic.domain.model.readableDate
 import com.diabetic.domain.service.ReportMeta
-import com.diabetic.domain.service.excel
+import com.diabetic.domain.service.generateGlucoseReport
 import java.io.OutputStream
-import java.time.LocalDateTime
 
-class PrepareGlucoseLevelsReport {
-    data class GenerateFileNameCommand(
-        val range: Pair<LocalDateTime, LocalDateTime>?
-    )
-
-    data class WriteReportCommand(
-        val range: Pair<LocalDateTime, LocalDateTime>?,
-        val stream: OutputStream
-    )
-
+class PrepareGlucoseLevelsReport : PrepareReport() {
     class Handler(
         private val repository: GlucoseLevelRepository,
-    ) {
+    ) : PrepareReport.Handler() {
+        override val template: String = "Glucose_level_report.%s.xlsx"
+        override val sheetName: String = "Отчет по глюкозе"
 
-        fun handle(command: GenerateFileNameCommand): String {
-            val range = command.range
-
-            val template = "Glucose_level_report.%s.xlsx"
-            return if (range == null) {
-                template.format("for_all_time")
-            } else {
-                template.format(
-                    "${range.from.readableDate()}_${range.to.readableDate()}"
-                )
-            }
-        }
-
-        fun handle(command: WriteReportCommand) {
+        override fun OutputStream.writeReport(
+            command: WriteReportCommand,
+            meta: ReportMeta
+        ): OutputStream {
             val levels = repository.run {
                 if (command.range === null) fetch() else fetch(
                     command.range.from,
@@ -42,19 +23,10 @@ class PrepareGlucoseLevelsReport {
                 )
             }
 
-
-            val meta = ReportMeta(
-                range = if (command.range == null) null else ReportMeta.Range(
-                    command.range
-                )
+            return this.generateGlucoseReport(
+                levels,
+                meta
             )
-
-            return command.stream
-                .excel(levels, meta)
-                .close()
         }
-
-        private val Pair<LocalDateTime, LocalDateTime>.from: LocalDateTime get() = this.first
-        private val Pair<LocalDateTime, LocalDateTime>.to: LocalDateTime get() = this.second
     }
 }

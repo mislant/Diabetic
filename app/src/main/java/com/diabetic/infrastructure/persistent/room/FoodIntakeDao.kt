@@ -1,38 +1,25 @@
 package com.diabetic.infrastructure.persistent.room
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.diabetic.domain.model.FoodIntake
 
 @Dao
 interface FoodIntakeDao {
-    @Transaction
-    fun newFoodIntake(foodIntake: FoodIntake): Long {
-        val levelEntityId = insertGlucoseLevel(
-            GlucoseLevelEntity(
-                measureType = foodIntake.glucoseBeforeMeal.type.toString(),
-                value = foodIntake.glucoseBeforeMeal.value.level,
-                date = foodIntake.glucoseBeforeMeal.date.format().iso()
-            )
-        )
-
-        val foodIntakeEntity = FoodIntakeEntity(
-            breadUnit = foodIntake.breadUnit.value,
-            date = foodIntake.date.format().iso(),
-            glucoseBeforeMeal = levelEntityId.toInt(),
-            glucoseAfterMeal = null
-        )
-        return insertFoodIntake(foodIntakeEntity)
-    }
-
     @Insert
-    fun insertGlucoseLevel(glucoseLevel: GlucoseLevelEntity): Long
-
-    @Insert
-    fun insertFoodIntake(foodIntake: FoodIntakeEntity): Long
+    fun insert(foodIntake: FoodIntakeEntity): Long
 
     @Query("SELECT * FROM food_intake WHERE id=:id")
-    fun fetchFoodIntakeGlucose(id: Int): FoodIntakeGlucoseEntity?
+    fun fetch(id: Int): FoodIntakeEntity?
+
+    @Query("SELECT * FROM food_intake ORDER BY datetime")
+    fun fetch(): List<FoodIntakeEntity>
+
+    @Query("SELECT * FROM food_intake WHERE datetime BETWEEN :from AND :to ORDER BY datetime")
+    fun fetch(from: Long, to: Long): List<FoodIntakeEntity>
+
+    @Delete
+    fun delete(foodIntake: FoodIntakeEntity)
 }

@@ -9,5 +9,5 @@ class GlucoseLevelEntity(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     @ColumnInfo(name = "measure_type") val measureType: String,
     @ColumnInfo(name = "value") val value: Float,
-    @ColumnInfo(name = "date") val date: String
-) {}
+    @ColumnInfo(name = "datetime") val datetime: Long
+)

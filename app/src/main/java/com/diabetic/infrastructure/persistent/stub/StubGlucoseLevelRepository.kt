@@ -11,12 +11,19 @@ class StubGlucoseLevelRepository : InMemoryStorage<GlucoseLevel>(), GlucoseLevel
 
     override fun fetch(from: LocalDateTime, to: LocalDateTime): List<GlucoseLevel> {
         return storage.toList().filter {
-            it.date.localDataTime() > from &&
-                    it.date.localDataTime() < to
+            it.datetime > from &&
+                    it.datetime < to
         }
     }
 
     override fun persist(glucoseLevel: GlucoseLevel) {
         storage.add(glucoseLevel)
+    }
+
+    override fun fetch(id: Int): GlucoseLevel? =
+        storage.find { it.id == id }
+
+    override fun delete(id: Int) {
+        storage.removeAt(id)
     }
 }

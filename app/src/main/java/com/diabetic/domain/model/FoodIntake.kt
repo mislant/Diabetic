@@ -1,20 +1,11 @@
 package com.diabetic.domain.model
 
+import java.time.LocalDateTime
+
 data class FoodIntake(
     var breadUnit: BreadUnit,
-    var date: DateTime,
-    var glucoseBeforeMeal: GlucoseLevel,
-    var glucoseAfterMeal: GlucoseLevel? = null
-) {
+    var insulin: ShortInsulin,
+    var datetime: LocalDateTime = LocalDateTime.now(),
     var id: Int? = null
-
-    constructor(
-        id: Int,
-        breadUnit: BreadUnit,
-        date: DateTime,
-        glucoseBeforeMeal: GlucoseLevel,
-        glucoseAfterMeal: GlucoseLevel? = null
-    ) : this(breadUnit, date, glucoseBeforeMeal, glucoseAfterMeal) {
-        this.id = id
-    }
+) {
 }

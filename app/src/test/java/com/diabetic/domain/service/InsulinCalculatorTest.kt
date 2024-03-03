@@ -2,7 +2,7 @@ package com.diabetic.domain.service
 
 import com.diabetic.domain.model.BreadUnit
 import com.diabetic.domain.model.Carbohydrate
-import com.diabetic.domain.model.Insulin
+import com.diabetic.domain.model.ShortInsulin
 import org.junit.Assert
 import org.junit.Test
 
@@ -14,11 +14,11 @@ class InsulinCalculatorTest {
         val carbohydrate = Carbohydrate(1.2F)
         val calculator = InsulinCalculator()
 
-        val insulin = calculator.calculateBeforeFoodIntake(
+        val insulin = calculator.calculateInsulin(
             breadUnit,
             carbohydrate
         )
 
-        Assert.assertTrue(insulin == Insulin(1.2F))
+        Assert.assertTrue(insulin == ShortInsulin(1.2F))
     }
 }

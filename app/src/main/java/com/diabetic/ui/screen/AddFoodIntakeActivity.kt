@@ -1,21 +1,27 @@
 package com.diabetic.ui.screen
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Bloodtype
 import androidx.compose.material.icons.filled.Co2
 import androidx.compose.material.icons.filled.RestaurantMenu
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,24 +31,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.diabetic.application.command.AddCarbohydrate
 import com.diabetic.application.command.BeginFoodIntake
-import com.diabetic.application.command.CalculateInsulinBeforeFoodIntake
 import com.diabetic.domain.model.CarbohydrateStorage
-import com.diabetic.domain.model.Insulin
+import com.diabetic.domain.model.ShortInsulin
 import com.diabetic.infrastructure.persistent.stub.StubCarbohydrateStorage
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
+import com.diabetic.ui.screen.main.MainActivity
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -79,7 +86,6 @@ private fun Content(
 
                 FoodIntakeInput(
                     state.value,
-                    model::changeGlucoseLevel,
                     model::changeBreadUnit,
                     model::changeCarbohydrate,
                     model::addFoodIntake,
@@ -93,7 +99,6 @@ private fun Content(
 @Composable
 private fun FoodIntakeInput(
     state: FoodIntakeState,
-    onGlucoseLevelChange: (String) -> Unit,
     onBreadUnitChange: (String) -> Unit,
     onCarbohydrate: (String) -> Unit,
     onSave: () -> Unit,
@@ -106,10 +111,10 @@ private fun FoodIntakeInput(
         onErrorShown()
     }
 
-    if (state.isSaved) InsulinView(state)
-    else AddFoodIntakeForm(
+    if (state.showInsulin) InsulinView(state)
+
+    AddFoodIntakeForm(
         state,
-        onGlucoseLevelChange,
         onBreadUnitChange,
         onCarbohydrate,
         onSave
@@ -119,7 +124,6 @@ private fun FoodIntakeInput(
 @Composable
 private fun AddFoodIntakeForm(
     state: FoodIntakeState,
-    onGlucoseLevelChange: (String) -> Unit,
     onBreadUnitChange: (String) -> Unit,
     onCarbohydrate: (String) -> Unit,
     onSave: () -> Unit,
@@ -128,20 +132,6 @@ private fun AddFoodIntakeForm(
         Spacer(modifier = Modifier.size(20.dp))
     }
 
-    OutlinedTextField(
-        value = state.glucoseLevel,
-        singleLine = true,
-        onValueChange = onGlucoseLevelChange,
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Bloodtype,
-                contentDescription = null
-            )
-        },
-        placeholder = { Text(text = "Уровень глюкозы") },
-        label = { Text(text = "Уровень глюкозы") },
-    )
-    space()
     OutlinedTextField(
         value = state.breadUnit,
         singleLine = true,
@@ -152,6 +142,9 @@ private fun AddFoodIntakeForm(
                 contentDescription = null
             )
         },
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Number
+        ),
         placeholder = { Text(text = "Хлебные единицы") },
         label = { Text(text = "Хлебные единицы") }
     )
@@ -160,6 +153,9 @@ private fun AddFoodIntakeForm(
         value = state.carbohydrate,
         singleLine = true,
         onValueChange = onCarbohydrate,
+        keyboardOptions = KeyboardOptions.Default.copy(
+            keyboardType = KeyboardType.Decimal
+        ),
         leadingIcon = {
             Icon(
                 imageVector = Icons.Default.Co2,
@@ -167,10 +163,10 @@ private fun AddFoodIntakeForm(
             )
         },
         placeholder = {
-            Text(text = "Углеводородный индекс")
+            Text(text = "Углеводный коэффицент")
         },
         label = {
-            Text(text = "Углеводородный индекс")
+            Text(text = "Углеводный коэффицент")
         }
     )
     space()
@@ -179,25 +175,53 @@ private fun AddFoodIntakeForm(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InsulinView(state: FoodIntakeState) {
-    Text(
-        text = "Количество инсулина, которое вам необходимо принять",
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.titleLarge
-    )
-    Text(
-        text = state.calculatedInsulin!!.value.toString(),
-        style = MaterialTheme.typography.displayLarge,
-        fontWeight = FontWeight.Bold
-    )
+    val ctx = LocalContext.current
+
+    AlertDialog(
+        onDismissRequest = {
+            Intent(ctx, MainActivity::class.java).also {
+                ctx.startActivity(it)
+            }
+        }
+    ) {
+        Column(
+            Modifier
+                .clip(RoundedCornerShape(35.dp))
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxHeight(0.25F)
+                .padding(15.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Количество инсулина, которое вам необходимо принять",
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.titleLarge
+            )
+            Text(
+                text = state.calculatedInsulin!!.value.toString(),
+                style = MaterialTheme.typography.displayLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
 }
+
+private data class FoodIntakeState(
+    val breadUnit: String = "",
+    val carbohydrate: String = "",
+    val error: String = "",
+    val showInsulin: Boolean = false,
+    val calculatedInsulin: ShortInsulin? = null
+)
 
 private class FoodIntakeViewModel(
     private val carbohydrateStorage: CarbohydrateStorage,
     private val beginFoodIntake: BeginFoodIntake.Handler,
     private val addCarbohydrate: AddCarbohydrate.Handler,
-    private val calculateInsulinBeforeFoodIntake: CalculateInsulinBeforeFoodIntake.Handler,
     initialState: FoodIntakeState = FoodIntakeState()
 ) : ViewModel() {
     private var _state = MutableStateFlow(initialState)
@@ -210,14 +234,6 @@ private class FoodIntakeViewModel(
         if (carbohydrate != null) {
             _state.value = _state.value.copy(
                 carbohydrate = carbohydrate.value.toString()
-            )
-        }
-    }
-
-    fun changeGlucoseLevel(value: String) {
-        if (value.isFloatGraterThenZero() || value.isEmpty()) {
-            _state.value = _state.value.copy(
-                glucoseLevel = value
             )
         }
     }
@@ -251,29 +267,21 @@ private class FoodIntakeViewModel(
 
         if (
             state.breadUnit.isEmpty() ||
-            state.glucoseLevel.isEmpty() ||
             state.carbohydrate.isEmpty()
         ) {
-            addError("Заполните все поля")
+            error("Заполните все поля")
         }
 
         try {
             saveFoodIntakeForm()
         } catch (e: Throwable) {
             Log.e(null, e.toString())
-            this.addError("Что-то пошло не так :(")
+            this.error("Что-то пошло не так :(")
         }
     }
 
     private fun saveFoodIntakeForm() {
         val state = _state.value
-
-        val savedFoodIntake = beginFoodIntake.handle(
-            BeginFoodIntake.Command(
-                state.glucoseLevel.toFloat(),
-                state.breadUnit.toInt(),
-            )
-        )
 
         addCarbohydrate.handle(
             AddCarbohydrate.Command(
@@ -281,24 +289,23 @@ private class FoodIntakeViewModel(
             )
         )
 
-        val calculatedInsulin = calculateInsulinBeforeFoodIntake.handle(
-            CalculateInsulinBeforeFoodIntake.Command(
-                savedFoodIntake
+        val insulin = beginFoodIntake.handle(
+            BeginFoodIntake.Command(
+                state.breadUnit.toInt(),
             )
         )
 
         _state.value = _state.value.copy(
-            isSaved = true,
-            calculatedInsulin = calculatedInsulin
+            showInsulin = true,
+            calculatedInsulin = insulin
         )
     }
 
     fun flushError() {
-        this.addError("")
+        this.error("")
     }
 
-
-    private fun addError(message: String) {
+    private fun error(message: String) {
         _state.value = _state.value.copy(
             error = message
         )
@@ -312,21 +319,10 @@ private class FoodIntakeViewModel(
                     ServiceLocator.carbohydrateStorage(),
                     ServiceLocator.beginFoodIntakeHandler(),
                     ServiceLocator.addCarbohydrateHandler(),
-                    ServiceLocator.calculateInsulinBeforeFoodIntakeHandler()
                 ) as T
             }
         }
     }
-}
-
-private data class FoodIntakeState(
-    val glucoseLevel: String = "",
-    val breadUnit: String = "",
-    val carbohydrate: String = "",
-    val error: String = "",
-    val isSaved: Boolean = false,
-    val calculatedInsulin: Insulin? = null
-) {
 }
 
 @Preview
@@ -338,12 +334,8 @@ private fun ContentFormPreview() {
     Content(
         FoodIntakeViewModel(
             StubCarbohydrateStorage(),
-            BeginFoodIntake.Handler(foodIntakeRepository),
+            BeginFoodIntake.Handler(foodIntakeRepository, carbohydrateStorage),
             AddCarbohydrate.Handler(carbohydrateStorage),
-            CalculateInsulinBeforeFoodIntake.Handler(
-                foodIntakeRepository,
-                carbohydrateStorage
-            ),
             FoodIntakeState()
         )
     )
@@ -358,15 +350,11 @@ private fun ContentPreview() {
     Content(
         FoodIntakeViewModel(
             StubCarbohydrateStorage(),
-            BeginFoodIntake.Handler(foodIntakeRepository),
+            BeginFoodIntake.Handler(foodIntakeRepository, carbohydrateStorage),
             AddCarbohydrate.Handler(carbohydrateStorage),
-            CalculateInsulinBeforeFoodIntake.Handler(
-                foodIntakeRepository,
-                carbohydrateStorage
-            ),
             FoodIntakeState(
-                isSaved = true,
-                calculatedInsulin = Insulin(2.2F)
+                showInsulin = true,
+                calculatedInsulin = ShortInsulin(2.2F)
             )
         )
     )
