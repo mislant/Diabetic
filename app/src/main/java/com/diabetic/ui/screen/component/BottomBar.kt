@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.diabetic.ui.screen.ChartsActivity
-import com.diabetic.ui.screen.MainActivity
+import com.diabetic.ui.screen.main.MainActivity
 import com.diabetic.ui.screen.statistic.StatisticActivity
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlin.reflect.KClass

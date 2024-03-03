@@ -14,12 +14,14 @@ import com.diabetic.ui.theme.DiabeticMaterialTheme
 @Composable
 fun DiabeticLayout(
     topBarContent: @Composable (() -> Unit)? = null,
+    floatingActionButton: @Composable () -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
+        modifier = Modifier.fillMaxSize(),
         topBar = { TopBar(topBarContent) },
         bottomBar = { BottomBar() },
-        modifier = Modifier.fillMaxSize()
+        floatingActionButton = floatingActionButton
     ) { innerPadding ->
         content(innerPadding)
     }

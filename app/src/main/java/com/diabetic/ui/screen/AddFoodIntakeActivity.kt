@@ -49,6 +49,7 @@ import com.diabetic.infrastructure.persistent.stub.StubCarbohydrateStorage
 import com.diabetic.infrastructure.persistent.stub.StubFoodIntakeRepository
 import com.diabetic.ui.ServiceLocator
 import com.diabetic.ui.screen.component.DiabeticLayout
+import com.diabetic.ui.screen.main.MainActivity
 import com.diabetic.ui.theme.DiabeticMaterialTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
