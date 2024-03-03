@@ -11,6 +11,7 @@ private enum class Format(
 ) {
     ISO("yyyy-MM-dd HH:mm:ss.SSS"),
     READABLE("yyyy-MM-dd HH:mm"),
+    READABLE_SHORT("dMMMyy HH:mm"),
     DATE("yyyy-MM-dd"),
     TIME("HH:mm");
 
@@ -52,5 +53,6 @@ val LocalDateTime.milliseconds: Long
 
 val LocalDateTime.iso: String get() = this.format(Format.ISO.formatter)
 val LocalDateTime.readable: String get() = this.format(Format.READABLE.formatter)
+val LocalDateTime.readableShort: String get() = this.format(Format.READABLE_SHORT.formatter)
 val LocalDateTime.readableDate: String get() = this.format(Format.DATE.formatter)
 val LocalDateTime.readableTime: String get() = this.format(Format.TIME.formatter)

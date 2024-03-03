@@ -26,6 +26,7 @@
         <activity android:name="com.diabetic.ui.screen.AddGlucoseActivity" />
         <activity android:name="com.diabetic.ui.screen.AddLongInsulinActivity" />
         <activity android:name="com.diabetic.ui.screen.statistic.StatisticActivity" />
+        <activity android:name="com.diabetic.ui.screen.ChartsActivity" />
     </application>
 
 </manifest>

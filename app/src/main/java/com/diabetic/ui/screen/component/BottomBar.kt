@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.StackedLineChart
 import androidx.compose.material.icons.filled.WaterDrop
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
@@ -26,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.diabetic.ui.screen.ChartsActivity
 import com.diabetic.ui.screen.MainActivity
 import com.diabetic.ui.screen.statistic.StatisticActivity
 import com.diabetic.ui.theme.DiabeticMaterialTheme
@@ -45,7 +47,7 @@ internal fun BottomBar() {
             Row(
                 Modifier
                     .fillMaxHeight()
-                    .width(240.dp),
+                    .width(360.dp),
                 Arrangement.SpaceAround
             ) {
                 BottomButton(
@@ -57,6 +59,11 @@ internal fun BottomBar() {
                     icon = Icons.Default.BarChart,
                     text = "Статистика",
                     toActivity = StatisticActivity::class
+                )
+                BottomButton(
+                    icon = Icons.Default.StackedLineChart,
+                    text = "Статистика",
+                    toActivity = ChartsActivity::class
                 )
             }
         }
